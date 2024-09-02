@@ -3,8 +3,8 @@
 
 // Website metadata
 export const SITE_URL: string = "https://astrostarter.zank.studio";
-export const SITE_TITLE: string = "Astro Blog";
-export const SITE_DESCRIPTION: string = "Welcome to my website!";
+export const SITE_TITLE: string = "Saisonkalender";
+export const SITE_DESCRIPTION: string = "Willkommen zum Saisonkalender für Deutschland!";
 
 // SEO metadata
 export const TWITTER_CREATOR: string = "@xxx";
@@ -18,22 +18,18 @@ type Page = {
 
 export const PAGES: Page[] = [
 	{
-		title: "home",
+		title: "Saisonkalender",
 		href: "/",
 	},
 	{
-		title: "blog",
-		href: "/blog",
-	},
-	{
-		title: "about",
+		title: "Über",
 		href: "/about",
 	},
 ];
 
 // i18n
-export const DEFAULT_LOCALE = "en";
+export const DEFAULT_LOCALE = "de";
 export const LOCALES = {
-	en: "en", // the `defaultLocale` value must present in `locales` keys
+	de: "de", // the `defaultLocale` value must present in `locales` keys
 	it: "it",
 };

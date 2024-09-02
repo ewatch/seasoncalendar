@@ -1,0 +1,57 @@
+---
+import foodData from "@locales/de/food-calendar.json";
+import { getAvailableInMonth } from "@src/utils/foodFilter.js"
+
+/*
+interface Props {
+	date: Date;
+	includeTime?: boolean;
+}
+    */
+
+const currentMonth = "AUG";
+const food = getAvailableInMonth(foodData, currentMonth);
+
+const { date, includeTime } = Astro.props;
+---
+<div>
+    <h2 class="py-2 font-bold font-sans break-normal text-lima-900 pt-6 pb-2 text-3xl md:text-4xl">August</h2>
+    <h3 class="py-2 font-sans text-lima-800 text-xl md:text-2xl">Gemüse</h3>
+    <div>
+        <ul>
+            {food.vegetables.map((vegetable: any ) => 
+                <li><a href={vegetable.details.link}>{vegetable.details.icon} {vegetable.name}</a></li>
+              )
+            }
+        </ul>        
+    </div>
+    <h3 class="py-2 font-sans text-lima-800 text-xl md:text-2xl">Kräuter</h3>
+    <div>
+        <ul>
+            {food.herbs.map((herb: string ) => 
+                <li>{herb}</li>
+              )
+            }
+        </ul>       
+    </div>
+
+    <h3 class="py-2 font-sans text-lima-800 text-xl md:text-2xl">Obst</h3>
+    <div>
+        <ul>
+            {food.fruits.map((fruit: string ) => 
+                <li>{fruit}</li>
+              )
+            }
+        </ul>         
+    </div>
+
+    <h3 class="py-2 font-sans text-lima-800 text-xl md:text-2xl">Salat</h3>
+    <div>
+        <ul>
+            {food.salads.map((salad: string ) => 
+                <li>{salad}</li>
+              )
+            }
+        </ul>            
+    </div>
+</div>

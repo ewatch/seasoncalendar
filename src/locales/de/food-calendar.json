@@ -1,0 +1,338 @@
+{
+    "availability": {
+        "vegetables": {
+            "Artischocke": {
+            "months": ["JUN", "JUL", "AUG", "SEP", "OKT"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/artischocke/"
+            },
+            "Aubergine": {
+            "months": ["JUL", "AUG", "SEP"],
+            "icon": "🍆",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/aubergine/"
+            },
+            "Blumenkohl": {
+            "months": ["MAI", "JUN", "JUL", "AUG", "SEP", "OKT"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/blumenkohl/"
+            },
+            "Bohnen, dicke": {
+            "months": ["JUN", "JUL"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/dicke-bohnen/"
+            },
+            "Bohnen, grüne": {
+            "months": ["JUL", "AUG", "SEP"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/gruene-bohnen/"
+            },
+            "Brokkoli": {
+            "months": ["JUN", "JUL", "AUG", "SEP", "OKT"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/brokkoli/"
+            },
+            "Butternut-Kürbis": {
+            "months": ["SEP", "OKT", "NOV"],
+            "icon": "🎃",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/kuerbis/"
+            },
+            "Champignon": {
+            "months": ["JAN", "FEB", "MAR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"],
+            "icon": "🍄",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/champignon/"
+            },
+            "Chinakohl": {
+            "months": ["SEP", "OKT", "NOV", "DEZ"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/chinakohl/"
+            },
+            "Erbse": {
+            "months": ["JUN", "JUL"],
+            "icon": "🍃",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/erbsen/"
+            },
+            "Fenchel": {
+            "months": ["JUN", "JUL", "AUG", "SEP", "OKT"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/fenchel/"
+            },
+            "Fruchtgemüse": {
+            "months": ["MAI", "JUN", "JUL", "AUG", "SEP", "OKT"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/"
+            },
+            "Frühlingszwiebel": {
+            "months": ["APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/fruehlingszwiebel/"
+            },
+            "Grünkohl": {
+            "months": ["JAN", "FEB", "MAR", "NOV", "DEZ"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/gruenkohl/"
+            },
+            "Hokkaido": {
+            "months": ["SEP", "OKT", "NOV"],
+            "icon": "🎃",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/kuerbis/"
+            },
+            "Kartoffel": {
+            "months": ["JAN", "FEB", "MAR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"],
+            "icon": "🥔",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/kartoffel/"
+            },
+            "Knollensellerie": {
+            "months": ["JAN", "FEB", "MAR", "NOV", "DEZ"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/sellerie/"
+            },
+            "Kohlrabi": {
+            "months": ["MAI", "JUN", "JUL", "AUG", "SEP", "OKT"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/kohlrabi/"
+            },
+            "Kürbis": {
+            "months": ["SEP", "OKT", "NOV"],
+            "icon": "🎃",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/kuerbis/"
+            },
+            "Mais": {
+            "months": ["JUL", "AUG", "SEP", "OKT"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/mais/"
+            },
+            "Mairübe": {
+            "months": ["APR", "MAI", "JUN"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/mairuebe/"
+            },
+            "Mangold": {
+            "months": ["MAI", "JUN", "JUL", "AUG", "SEP", "OKT"],
+            "icon": "🥬",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/mangold/"
+            },
+            "Meerrettich": {
+            "months": ["JAN", "FEB", "MAR", "OKT", "NOV", "DEZ"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/meerrettich/"
+            },
+            "Möhre": {
+            "months": ["JAN", "FEB", "MAR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"],
+            "icon": "🥕",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/moehre/"
+            },
+            "Pak Choi": {
+            "months": ["MAI", "JUN", "JUL", "AUG", "SEP", "OKT"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/pak-choi/"
+            },
+            "Pastinake": {
+            "months": ["JAN", "FEB", "MAR", "NOV", "DEZ"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/pastinake/"
+            },
+            "Petersilienwurzel": {
+            "months": ["JAN", "FEB", "NOV", "DEZ"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/petersilienwurzel/"
+            },
+            "Pfifferling": {
+            "months": ["JUL", "AUG", "SEP", "OKT"],
+            "icon": "🍄",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/pfifferlinge/"
+            },
+            "Porree/Lauch": {
+            "months": ["JAN", "FEB", "MAR", "APR", "MAI", "SEP", "OKT", "NOV", "DEZ"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/porree/"
+            },
+            "Portulak": {
+            "months": ["JAN", "FEB", "MAR", "APR", "NOV", "DEZ"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/portulak/"
+            },
+            "Radieschen": {
+            "months": ["APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT"],
+            "icon": "🌶️",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/radieschen/"
+            },
+            "Rettich": {
+            "months": ["APR", "MAI", "SEP", "OKT"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/rettich/"
+            },
+            "Romanesco": {
+            "months": ["JUL", "AUG", "SEP"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/romanesco/"
+            },
+            "Rosenkohl": {
+            "months": ["JAN", "FEB", "MAR", "NOV", "DEZ"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/rosenkohl/"
+            },
+            "Rote Bete": {
+            "months": ["JAN", "FEB", "MAR", "APR", "MAI", "SEP", "OKT", "NOV", "DEZ"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/rote-bete/"
+            },
+            "Rotkohl": {
+            "months": ["JAN", "FEB", "MAR", "NOV", "DEZ"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/rotkohl/"
+            },
+            "Salatgurke": {
+            "months": ["JUN", "JUL", "AUG", "SEP"],
+            "icon": "🥒",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/salatgurke/"
+            },
+            "Schalotte": {
+            "months": ["JAN", "FEB", "MAR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"],
+            "icon": "🧅",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/schalotte/"
+            },
+            "Spaghettikürbis": {
+            "months": ["AUG", "SEP", "OKT"],
+            "icon": "🎃",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/kuerbis/"
+            },
+            "Spargel": {
+            "months": ["APR", "MAI", "JUN"],
+            "icon": "🥗",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/spargel/"
+            },
+            "Spinat": {
+            "months": ["APR", "MAI", "SEP", "OKT"],
+            "icon": "🥬",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/spinat/"
+            },
+            "Spitzkohl": {
+            "months": ["JUN", "JUL", "AUG"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/spitzkohl/"
+            },
+            "Staudensellerie": {
+            "months": ["JUL", "AUG", "SEP", "OKT"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/sellerie/"
+            },
+            "Steckrübe": {
+            "months": ["JAN", "FEB", "MAR", "OKT", "NOV", "DEZ"],
+            "icon": "",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/steckruebe/"
+            },
+            "Steinpilz": {
+            "months": ["AUG", "SEP", "OKT"],
+            "icon": "🍄",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/steinpilze/"
+            },
+            "Süßkartoffel": {
+            "months": ["JAN", "FEB", "MAR", "NOV", "DEZ"],
+            "icon": "🍠",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/suesskartoffel/"
+            },
+            "Tomate": {
+            "months": ["AUG", "SEP"],
+            "icon": "🍅",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/tomate/"
+            },
+            "Weißkohl": {
+            "months": ["JAN", "FEB", "MAR", "NOV", "DEZ"],
+            "icon": "🥬",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/weisskohl/"
+            },
+            "Wirsing": {
+            "months": ["JAN", "FEB", "MAR", "NOV", "DEZ"],
+            "icon": "🥬",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/wirsing/"
+            },
+            "Zucker-/Kaiserschote": {
+            "months": ["MAI", "JUN"],
+            "icon": "🌱",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/zuckererbsen/"
+            },
+            "Zucchini": {
+            "months": ["JUL", "AUG", "SEP"],
+            "icon": "🥒",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/zucchini/"
+            },
+            "Zwiebel": {
+            "months": ["JAN", "FEB", "MAR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"],
+            "icon": "🧅",
+            "link": "https://www.bzfe.de/lebensmittel/lebensmittelkunde/gemuese/zwiebel/"
+            }
+        },
+        "fruits": {
+            "Johannisbeere": {
+                "months": ["JUL","AUG"]
+            },
+            "Stachelbeere": {
+                "months": ["JUN","JUL","AUG"]
+            },
+            "Birne": {
+                "months": ["AUG","SEP","OKT","NOV"]
+            },
+            "Holunderbeere": {
+                "months": ["AUG","SEP","OKT"]
+            },
+            "Quitte": {
+                "months": ["SEP","OKT","NOV"]
+            },
+            "Mirabelle": {
+                "months": ["AUG"]
+            },
+            "Zwetschge": {
+                "months": ["AUG","SEP"]
+            },
+            "Aprikose": {
+                "months": ["JUN","JUL","AUG"]
+            },
+            "Apfel": {
+                "months": ["SEP","OKT","NOV"]
+            },
+            "Himbeere": {
+                "months": ["JUN","JUL","AUG","SEP"]
+            }
+        },
+        "herbs": {
+            "Kerbel": {
+                "months": ["APR","MAI","JUN","JUL","AUG","SEP"]
+            },
+            "Petersilie": {
+                "months": ["APR","MAI","JUN","JUL","AUG","SEP","OKT"]
+            },
+            "Minze": {
+                "months": ["MAI","JUN","JUL","AUG","SEP"]
+            },
+            "Basilikum": {
+                "months": ["MAI","JUN","JUL","AUG","SEP"]
+            },
+            "Bärlauch": {
+                "months": ["APR","MAI","JUN"]
+            },
+            "Oregano": {
+                "months": ["MAI","JUN","JUL","AUG","SEP"]
+            }
+        },
+        "salads": {
+            "Kopfsalat": {
+                "months": ["MAI","JUN","JUL","AUG","SEP"]
+            },
+            "Bataviasalat": {
+                "months": ["MAI","JUN","JUL","AUG","SEP"]
+            },
+            "Romana-/Römersalat": {
+                "months": ["MAI","JUN","JUL","AUG","SEP","OKT"]
+            },
+            "Endiviensalat": {
+                "months": ["AUG","SEP","OKT","NOV","DEZ"]
+            },
+            "Eisbergsalat": {
+                "months": ["MAI","JUN","JUL","AUG","SEP","OKT"]
+            },
+            "Eichblattsalat": {
+                "months": ["MAI","JUN","JUL","AUG","SEP","OKT"]
+            }
+        }
+    }
+}

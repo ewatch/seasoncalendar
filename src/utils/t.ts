@@ -5,7 +5,7 @@
 import { DEFAULT_LOCALE, LOCALES } from "@src/consts";
 import { getLocale } from "astro-i18n-aut";
 
-import en from "@locales/en.json";
+import de from "@src/locales/de.json";
 import it from "@locales/it.json";
 
 const handler = {
@@ -15,7 +15,7 @@ const handler = {
 };
 
 const it_proxy = new Proxy(it, handler);
-const en_proxy = new Proxy(en, handler);
+const en_proxy = new Proxy(de, handler);
 
 export const defaultLocale = DEFAULT_LOCALE;
 export const locales = LOCALES;

@@ -3,12 +3,15 @@
 import translations from "@utils/t.ts";
 import Layout from "@layouts/Layout.astro";
 import Container from "@src/components/Container.astro";
+import Introduction from "@src/components/Introduction.astro"
+import FoodMonth from "@src/components/FoodMonth.astro"
 
 const t = translations(Astro.url);
 ---
 
 <Layout>
 	<Container class="pt-16">
-		<span set:html={t.home_description} />
+		<Introduction />
+		<FoodMonth />
 	</Container>
 </Layout>
