@@ -5,7 +5,7 @@
 import { DEFAULT_LOCALE, LOCALES } from "@src/consts";
 import { getLocale } from "astro-i18n-aut";
 
-import de from "@src/locales/de.json";
+import de from "@src/locales/de/de.json";
 import it from "@locales/it.json";
 
 const handler = {

@@ -22,3 +22,14 @@ export const getAvailableInMonth = function(data: any, month: string) {
     return availableInMonth;
 }
 
+
+/*
+The function will return the month as german three letter 
+capital abbreviation with one of the following values depending on the current month:
+["JAN", "FEB", "MAR", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"]
+*/
+export const getCurrentMonth = function() {
+    const date = new Date();
+    const month = date.toLocaleString('de-DE', { month: 'short' }).toUpperCase();
+    return month;
+}

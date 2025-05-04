@@ -4,7 +4,7 @@ import sitemap from "@astrojs/sitemap";
 import tailwind from "@astrojs/tailwind";
 import alpinejs from "@astrojs/alpinejs";
 import { i18n, filterSitemapByDefaultLocale } from "astro-i18n-aut/integration";
-import { DEFAULT_LOCALE, LOCALES, SITE_URL } from "./src/consts";
+import { DEFAULT_LOCALE, LOCALES, SITE_URL } from "./src/consts.ts";
 
 const defaultLocale = DEFAULT_LOCALE;
 const locales = LOCALES;
