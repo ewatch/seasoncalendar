@@ -7,10 +7,20 @@ export const getAvailableInMonth = function(data: any, month: string) {
     };
 
     for (const category in data.availability) {
+        // Make sure the category exists in our result object
+        if (!availableInMonth[category]) {
+            availableInMonth[category] = [];
+        }
+        
         for (const item in data.availability[category]) {
-            if (data.availability[category][item].months.includes(month)) {
+            const itemData = data.availability[category][item];
+            // Check if the item is available in the given month (either freiland or lager)
+            const isAvailable = (itemData.freiland_months && itemData.freiland_months.includes(month)) ||
+                               (itemData.lager_months && itemData.lager_months.includes(month));
+            
+            if (isAvailable) {
                 if(category === "vegetables") {
-                    availableInMonth[category].push({"name": item, "details": data.availability[category][item]});
+                    availableInMonth[category].push({"name": item, "details": itemData});
                 }
                 else {
                     availableInMonth[category].push(item);
