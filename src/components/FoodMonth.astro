@@ -1,9 +1,11 @@
 ---
 import foodData from "@locales/de/food-calendar.json";
-import { getAvailableInMonth, getCurrentMonth, getCurrentMonthDisplayName } from "@src/utils/foodFilter.js"
+import { getAvailableInMonth, getCurrentMonth, getCurrentMonthDisplayName } from "@src/utils/foodFilter.js";
 
+// Initial (current) month determined at build time – used for initial render only.
 const currentMonth = getCurrentMonth();
 const currentMonthDisplayName = getCurrentMonthDisplayName();
+const currentYear = new Date().getFullYear();
 const food = getAvailableInMonth(foodData, currentMonth);
 ---
 
@@ -13,9 +15,17 @@ const food = getAvailableInMonth(foodData, currentMonth);
         <h1 class="text-4xl md:text-5xl font-bold text-lima-900 mb-2">
             Saisonkalender
         </h1>
-        <h2 class="text-2xl md:text-3xl font-semibold text-lima-700 mb-4">
-            {currentMonthDisplayName} 2025
-        </h2>
+        <div class="flex items-center justify-center gap-4 mb-4" aria-live="polite">
+            <button id="prev-month" type="button" class="px-3 py-2 rounded border border-lima-300 text-lima-700 hover:bg-lima-100 focus:outline-none focus:ring-2 focus:ring-lima-400" aria-label="Vorheriger Monat">
+                ←
+            </button>
+            <h2 id="month-title" class="text-2xl md:text-3xl font-semibold text-lima-700">
+                {currentMonthDisplayName} {currentYear}
+            </h2>
+            <button id="next-month" type="button" class="px-3 py-2 rounded border border-lima-300 text-lima-700 hover:bg-lima-100 focus:outline-none focus:ring-2 focus:ring-lima-400" aria-label="Nächster Monat">
+                →
+            </button>
+        </div>
         <p class="text-lima-600 text-lg">
             Frische, saisonale Produkte für diesen Monat
         </p>
@@ -25,57 +35,60 @@ const food = getAvailableInMonth(foodData, currentMonth);
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         <!-- Vegetables Card -->
-        <div class="bg-green-50 border-2 border-green-200 rounded-lg p-6">
+        <div class="bg-green-50 border-2 border-green-200 rounded-lg p-6" data-category="vegetables">
             <div class="flex items-center mb-4">
                 <span class="text-2xl mr-3">🥕</span>
                 <h3 class="text-xl md:text-2xl font-bold text-green-800">Gemüse</h3>
             </div>
-            <ul class="space-y-2">
-                {food.vegetables.map((vegetable: any) => 
-                    <li class="text-gray-700">
-                        {vegetable.details.icon} {vegetable.name}
-                    </li>
-                )}
+            <ul id="vegetables-list" class="space-y-2">
+                {food.vegetables.map((vegetable: any) => (
+                    <li class="text-gray-700">{vegetable.details.icon} {vegetable.name}</li>
+                ))}
             </ul>
         </div>
 
         <!-- Fruits Card -->
-        <div class="bg-orange-50 border-2 border-orange-200 rounded-lg p-6">
+        <div class="bg-orange-50 border-2 border-orange-200 rounded-lg p-6" data-category="fruits">
             <div class="flex items-center mb-4">
                 <span class="text-2xl mr-3">🍎</span>
                 <h3 class="text-xl md:text-2xl font-bold text-orange-800">Obst</h3>
             </div>
-            <ul class="space-y-2">
-                {food.fruits.map((fruit: string) => 
+            <ul id="fruits-list" class="space-y-2">
+                {food.fruits.map((fruit: string) => (
                     <li class="text-gray-700">{fruit}</li>
-                )}
+                ))}
             </ul>
         </div>
 
         <!-- Herbs Card -->
-        <div class="bg-emerald-50 border-2 border-emerald-200 rounded-lg p-6">
+        <div class="bg-emerald-50 border-2 border-emerald-200 rounded-lg p-6" data-category="herbs">
             <div class="flex items-center mb-4">
                 <span class="text-2xl mr-3">🌿</span>
                 <h3 class="text-xl md:text-2xl font-bold text-emerald-800">Kräuter</h3>
             </div>
-            <ul class="space-y-2">
-                {food.herbs.map((herb: string) => 
+            <ul id="herbs-list" class="space-y-2">
+                {food.herbs.map((herb: string) => (
                     <li class="text-gray-700">{herb}</li>
-                )}
+                ))}
             </ul>
         </div>
 
         <!-- Salads Card -->
-        <div class="bg-lime-50 border-2 border-lime-200 rounded-lg p-6">
+        <div class="bg-lime-50 border-2 border-lime-200 rounded-lg p-6" data-category="salads">
             <div class="flex items-center mb-4">
                 <span class="text-2xl mr-3">🥬</span>
                 <h3 class="text-xl md:text-2xl font-bold text-lime-800">Salat</h3>
             </div>
-            <ul class="space-y-2">
-                {food.salads.map((salad: string) => 
+            <ul id="salads-list" class="space-y-2">
+                {food.salads.map((salad: string) => (
                     <li class="text-gray-700">{salad}</li>
-                )}
+                ))}
             </ul>
         </div>
     </div>
 </div>
+
+<!-- Embed the full food data for client-side navigation -->
+<!-- Embedded season data for client-side month navigation -->
+<script type="application/json" id="food-data" set:html={JSON.stringify(foodData)}></script>
+<script type="module" src="/foodMonthNav.js"></script>
