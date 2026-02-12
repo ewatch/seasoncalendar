@@ -30,6 +30,7 @@ type AvailableInMonth = {
 
 type GetAvailableOptions = {
 	onlyFreiland?: boolean;
+	onlyLager?: boolean;
 };
 
 const monthAliasMap: Record<string, MonthAbbreviation> = {
@@ -52,6 +53,7 @@ const monthAliasMap: Record<string, MonthAbbreviation> = {
 export const getAvailableInMonth = function (data: FoodData, month: string, options: GetAvailableOptions = {}): AvailableInMonth {
 	const normalizedMonth = normalizeMonthAbbreviation(month);
 	const onlyFreiland = options.onlyFreiland === true;
+	const onlyLager = options.onlyLager === true;
 	const availableInMonth: AvailableInMonth = {
 		vegetables: [],
 		fruits: [],
@@ -71,6 +73,10 @@ export const getAvailableInMonth = function (data: FoodData, month: string, opti
 			}
 
 			if (onlyFreiland && !isFreiland) {
+				continue;
+			}
+
+			if (onlyLager && !isLager) {
 				continue;
 			}
 

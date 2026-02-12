@@ -8,26 +8,26 @@ const currentMonth = getCurrentMonth();
 const currentMonthDisplayName = getCurrentMonthDisplayName();
 const food = getAvailableInMonth(foodData, currentMonth);
 
-const badgeLabel = {
+const statusLabel = {
 	freiland: "Freiland",
 	lager: "Lager",
 	both: "Freiland + Lager",
 } as const;
 
-function getBadgeClass(type: keyof typeof badgeLabel): string {
+function getStatusDotClass(type: keyof typeof statusLabel): string {
 	if (type === "freiland") {
-		return "bg-lima-100 text-lima-800";
+		return "bg-lima-400";
 	}
 
 	if (type === "both") {
-		return "bg-amber-100 text-amber-800";
+		return "bg-amber-300";
 	}
 
-	return "bg-stone-100 text-stone-600";
+	return "bg-stone-300";
 }
 ---
 
-<div class="max-w-5xl mx-auto px-4 py-8 md:py-12 sm:px-6 lg:px-8 bg-paper min-h-screen">
+<div id="food-month-root" class="max-w-5xl mx-auto px-4 py-8 md:py-12 sm:px-6 lg:px-8 bg-paper min-h-screen">
     <header class="mb-12 md:mb-16 text-center">
         <span class="inline-block text-stone-500 uppercase tracking-[0.2em] text-[10px] md:text-xs font-semibold mb-4">
             Der Saisonale Kalender
@@ -61,9 +61,17 @@ function getBadgeClass(type: keyof typeof badgeLabel): string {
                     <button id="filter-freiland" type="button" class="rounded-full border border-stone-300 bg-transparent text-stone-500 px-3 py-1 text-[10px] uppercase tracking-wider transition-colors" aria-pressed="false">
                         Nur Freiland
                     </button>
+                    <button id="filter-lager" type="button" class="rounded-full border border-stone-300 bg-transparent text-stone-500 px-3 py-1 text-[10px] uppercase tracking-wider transition-colors" aria-pressed="false">
+                        Nur Lager
+                    </button>
                 </div>
             )
         }
+        <div id="season-status-legend" class="mt-3 flex items-center justify-center gap-4 text-[10px] uppercase tracking-wider text-stone-500">
+            <span class="inline-flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-lima-400"></span> Freiland</span>
+            <span class="inline-flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-stone-300"></span> Lager</span>
+            <span class="inline-flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-amber-300"></span> Beides</span>
+        </div>
     </header>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 lg:gap-8">
@@ -76,9 +84,9 @@ function getBadgeClass(type: keyof typeof badgeLabel): string {
                 {food.vegetables.map((vegetable) => (
                     <li class="flex items-start gap-3 text-stone-600 group hover:text-lima-800 transition-colors cursor-default">
                         <span class="opacity-40 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5">{vegetable.details.icon}</span>
-                        <span class="flex min-w-0 items-center gap-2">
-                            <span class="text-sm tracking-wide truncate">{vegetable.name}</span>
-                            <span class:list={["shrink-0 rounded-full px-2 py-0.5 text-[9px] uppercase tracking-wide", getBadgeClass(vegetable.availabilityType)]}>{badgeLabel[vegetable.availabilityType]}</span>
+                        <span class="flex w-full min-w-0 items-center justify-between gap-2">
+                            <span class="text-sm tracking-wide truncate max-w-[84%]">{vegetable.name}</span>
+                            <span class:list={["h-2.5 w-2.5 shrink-0 rounded-full", getStatusDotClass(vegetable.availabilityType)]} title={statusLabel[vegetable.availabilityType]}></span>
                         </span>
                     </li>
                 ))}
@@ -94,9 +102,9 @@ function getBadgeClass(type: keyof typeof badgeLabel): string {
                 {food.fruits.map((fruit) => (
                     <li class="flex items-start gap-3 text-stone-600 group hover:text-lima-800 transition-colors cursor-default">
                         <span class="w-1.5 h-1.5 rounded-full bg-stone-200 group-hover:bg-lima-400 transition-colors shrink-0 mt-2"></span>
-                        <span class="flex min-w-0 items-center gap-2">
-                            <span class="text-sm tracking-wide truncate">{fruit.name}</span>
-                            <span class:list={["shrink-0 rounded-full px-2 py-0.5 text-[9px] uppercase tracking-wide", getBadgeClass(fruit.availabilityType)]}>{badgeLabel[fruit.availabilityType]}</span>
+                        <span class="flex w-full min-w-0 items-center justify-between gap-2">
+                            <span class="text-sm tracking-wide truncate max-w-[84%]">{fruit.name}</span>
+                            <span class:list={["h-2.5 w-2.5 shrink-0 rounded-full", getStatusDotClass(fruit.availabilityType)]} title={statusLabel[fruit.availabilityType]}></span>
                         </span>
                     </li>
                 ))}
@@ -112,9 +120,9 @@ function getBadgeClass(type: keyof typeof badgeLabel): string {
                 {food.salads.map((salad) => (
                     <li class="flex items-start gap-3 text-stone-600 group hover:text-lima-800 transition-colors cursor-default">
                         <span class="w-1.5 h-1.5 rounded-full bg-stone-200 group-hover:bg-lima-400 transition-colors shrink-0 mt-2"></span>
-                        <span class="flex min-w-0 items-center gap-2">
-                            <span class="text-sm tracking-wide truncate">{salad.name}</span>
-                            <span class:list={["shrink-0 rounded-full px-2 py-0.5 text-[9px] uppercase tracking-wide", getBadgeClass(salad.availabilityType)]}>{badgeLabel[salad.availabilityType]}</span>
+                        <span class="flex w-full min-w-0 items-center justify-between gap-2">
+                            <span class="text-sm tracking-wide truncate max-w-[84%]">{salad.name}</span>
+                            <span class:list={["h-2.5 w-2.5 shrink-0 rounded-full", getStatusDotClass(salad.availabilityType)]} title={statusLabel[salad.availabilityType]}></span>
                         </span>
                     </li>
                 ))}
@@ -130,9 +138,9 @@ function getBadgeClass(type: keyof typeof badgeLabel): string {
                 {food.herbs.map((herb) => (
                     <li class="flex items-start gap-3 text-stone-600 group hover:text-lima-800 transition-colors cursor-default">
                         <span class="w-1.5 h-1.5 rounded-full bg-stone-200 group-hover:bg-lima-400 transition-colors shrink-0 mt-2"></span>
-                        <span class="flex min-w-0 items-center gap-2">
-                            <span class="text-sm tracking-wide truncate">{herb.name}</span>
-                            <span class:list={["shrink-0 rounded-full px-2 py-0.5 text-[9px] uppercase tracking-wide", getBadgeClass(herb.availabilityType)]}>{badgeLabel[herb.availabilityType]}</span>
+                        <span class="flex w-full min-w-0 items-center justify-between gap-2">
+                            <span class="text-sm tracking-wide truncate max-w-[84%]">{herb.name}</span>
+                            <span class:list={["h-2.5 w-2.5 shrink-0 rounded-full", getStatusDotClass(herb.availabilityType)]} title={statusLabel[herb.availabilityType]}></span>
                         </span>
                     </li>
                 ))}
@@ -154,22 +162,26 @@ function getBadgeClass(type: keyof typeof badgeLabel): string {
 
 	const SHOW_SEASON_FILTER = true;
 
-	const badgeStyles = {
-		freiland: "bg-lima-100 text-lima-800",
-		lager: "bg-stone-100 text-stone-600",
-		both: "bg-amber-100 text-amber-800",
+	const dotStyles = {
+		freiland: "bg-lima-400",
+		lager: "bg-stone-300",
+		both: "bg-amber-300",
 	};
 
-	const badgeLabels = {
+	const dotLabels = {
 		freiland: "Freiland",
 		lager: "Lager",
 		both: "Freiland + Lager",
 	};
 
-	function renderAvailabilityBadge(type: keyof typeof badgeStyles): string {
-		const style = badgeStyles[type] ?? badgeStyles.lager;
-		const label = badgeLabels[type] ?? badgeLabels.lager;
-		return `<span class="shrink-0 rounded-full px-2 py-0.5 text-[9px] uppercase tracking-wide ${style}">${label}</span>`;
+	function renderAvailabilityDot(type: keyof typeof dotStyles, filterMode: "all" | "freiland" | "lager"): string {
+		if (filterMode !== "all") {
+			return "";
+		}
+
+		const style = dotStyles[type] ?? dotStyles.lager;
+		const label = dotLabels[type] ?? dotLabels.lager;
+		return `<span class="h-2.5 w-2.5 shrink-0 rounded-full ${style}" title="${label}"></span>`;
 	}
 
 	function updateList<T>(listElement: HTMLElement | null, items: T[], renderFn: (item: T) => string): void {
@@ -193,27 +205,32 @@ function getBadgeClass(type: keyof typeof badgeLabel): string {
 		});
 	}
 
-	function applyFilterButtonStyles(onlyFreiland: boolean): void {
+	function applyFilterButtonStyles(filterMode: "all" | "freiland" | "lager"): void {
 		if (!SHOW_SEASON_FILTER) return;
 		const allButton = document.getElementById("filter-all");
 		const freilandButton = document.getElementById("filter-freiland");
+		const lagerButton = document.getElementById("filter-lager");
+		const legend = document.getElementById("season-status-legend");
 
-		if (!allButton || !freilandButton) return;
+		if (!allButton || !freilandButton || !lagerButton) return;
 
-		allButton.setAttribute("aria-pressed", String(!onlyFreiland));
-		freilandButton.setAttribute("aria-pressed", String(onlyFreiland));
+		const baseClass = "rounded-full border border-stone-300 bg-transparent text-stone-500 px-3 py-1 text-[10px] uppercase tracking-wider transition-colors";
+		const activeClass = "rounded-full border border-stone-300 bg-stone-900 text-paper px-3 py-1 text-[10px] uppercase tracking-wider transition-colors";
 
-		if (onlyFreiland) {
-			allButton.className = "rounded-full border border-stone-300 bg-transparent text-stone-500 px-3 py-1 text-[10px] uppercase tracking-wider transition-colors";
-			freilandButton.className = "rounded-full border border-stone-300 bg-stone-900 text-paper px-3 py-1 text-[10px] uppercase tracking-wider transition-colors";
-			return;
+		allButton.className = filterMode === "all" ? activeClass : baseClass;
+		freilandButton.className = filterMode === "freiland" ? activeClass : baseClass;
+		lagerButton.className = filterMode === "lager" ? activeClass : baseClass;
+
+		allButton.setAttribute("aria-pressed", String(filterMode === "all"));
+		freilandButton.setAttribute("aria-pressed", String(filterMode === "freiland"));
+		lagerButton.setAttribute("aria-pressed", String(filterMode === "lager"));
+
+		if (legend) {
+			legend.classList.toggle("hidden", filterMode !== "all");
 		}
-
-		allButton.className = "rounded-full border border-stone-300 bg-stone-900 text-paper px-3 py-1 text-[10px] uppercase tracking-wider transition-colors";
-		freilandButton.className = "rounded-full border border-stone-300 bg-transparent text-stone-500 px-3 py-1 text-[10px] uppercase tracking-wider transition-colors";
 	}
 
-	function updateMonthDisplay(monthAbbr: string, seasonData: Parameters<typeof getAvailableInMonth>[0], onlyFreiland: boolean): void {
+	function updateMonthDisplay(monthAbbr: string, seasonData: Parameters<typeof getAvailableInMonth>[0], filterMode: "all" | "freiland" | "lager"): void {
 		const monthTitle = document.getElementById("month-title");
 		const monthTitleMain = document.getElementById("month-title-main");
 		const displayName = getMonthDisplayName(monthAbbr);
@@ -225,41 +242,50 @@ function getBadgeClass(type: keyof typeof badgeLabel): string {
 			monthTitleMain.textContent = displayName;
 		}
 
-		const food = getAvailableInMonth(seasonData, monthAbbr, { onlyFreiland });
+		const food = getAvailableInMonth(seasonData, monthAbbr, {
+			onlyFreiland: filterMode === "freiland",
+			onlyLager: filterMode === "lager",
+		});
 
 		updateList(document.getElementById("vegetables-list"), food.vegetables, (v) => `
             <span class="opacity-40 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5">${v.details.icon || ""}</span>
-            <span class="flex min-w-0 items-center gap-2">
-                <span class="text-sm tracking-wide truncate">${v.name}</span>
-                ${renderAvailabilityBadge(v.availabilityType)}
+            <span class="flex w-full min-w-0 items-center justify-between gap-2">
+                <span class="text-sm tracking-wide truncate max-w-[84%]">${v.name}</span>
+                ${renderAvailabilityDot(v.availabilityType, filterMode)}
             </span>
         `);
 		updateList(document.getElementById("fruits-list"), food.fruits, (f) => `
             <span class="w-1.5 h-1.5 rounded-full bg-stone-200 group-hover:bg-lima-400 transition-colors shrink-0 mt-2"></span>
-            <span class="flex min-w-0 items-center gap-2">
-                <span class="text-sm tracking-wide truncate">${f.name}</span>
-                ${renderAvailabilityBadge(f.availabilityType)}
+            <span class="flex w-full min-w-0 items-center justify-between gap-2">
+                <span class="text-sm tracking-wide truncate max-w-[84%]">${f.name}</span>
+                ${renderAvailabilityDot(f.availabilityType, filterMode)}
             </span>
         `);
 		updateList(document.getElementById("herbs-list"), food.herbs, (h) => `
             <span class="w-1.5 h-1.5 rounded-full bg-stone-200 group-hover:bg-lima-400 transition-colors shrink-0 mt-2"></span>
-            <span class="flex min-w-0 items-center gap-2">
-                <span class="text-sm tracking-wide truncate">${h.name}</span>
-                ${renderAvailabilityBadge(h.availabilityType)}
+            <span class="flex w-full min-w-0 items-center justify-between gap-2">
+                <span class="text-sm tracking-wide truncate max-w-[84%]">${h.name}</span>
+                ${renderAvailabilityDot(h.availabilityType, filterMode)}
             </span>
         `);
 		updateList(document.getElementById("salads-list"), food.salads, (s) => `
             <span class="w-1.5 h-1.5 rounded-full bg-stone-200 group-hover:bg-lima-400 transition-colors shrink-0 mt-2"></span>
-            <span class="flex min-w-0 items-center gap-2">
-                <span class="text-sm tracking-wide truncate">${s.name}</span>
-                ${renderAvailabilityBadge(s.availabilityType)}
+            <span class="flex w-full min-w-0 items-center justify-between gap-2">
+                <span class="text-sm tracking-wide truncate max-w-[84%]">${s.name}</span>
+                ${renderAvailabilityDot(s.availabilityType, filterMode)}
             </span>
         `);
 
-		applyFilterButtonStyles(onlyFreiland);
+		applyFilterButtonStyles(filterMode);
 	}
 
-	document.addEventListener("DOMContentLoaded", () => {
+	function initSeasonCalendar(): void {
+		const root = document.getElementById("food-month-root");
+		if (!root || root.dataset.initialized === "true") {
+			return;
+		}
+		root.dataset.initialized = "true";
+
 		const foodDataScript = document.getElementById("food-data");
 		if (!foodDataScript) return;
 
@@ -274,41 +300,50 @@ function getBadgeClass(type: keyof typeof badgeLabel): string {
 		}
 
 		let currentDisplayedMonth = getCurrentMonth();
-		let onlyFreiland = false;
+		let filterMode: "all" | "freiland" | "lager" = "all";
 
-		const prevButton = document.getElementById("prev-month");
-		const nextButton = document.getElementById("next-month");
-		const allButton = document.getElementById("filter-all");
-		const freilandButton = document.getElementById("filter-freiland");
+		const prevButton = root.querySelector<HTMLElement>("#prev-month");
+		const nextButton = root.querySelector<HTMLElement>("#next-month");
+		const allButton = root.querySelector<HTMLElement>("#filter-all");
+		const freilandButton = root.querySelector<HTMLElement>("#filter-freiland");
+		const lagerButton = root.querySelector<HTMLElement>("#filter-lager");
 
 		if (!prevButton || !nextButton) return;
 
-		updateMonthDisplay(currentDisplayedMonth, seasonData, onlyFreiland);
+		updateMonthDisplay(currentDisplayedMonth, seasonData, filterMode);
 
 		prevButton.addEventListener("click", () => {
 			const previousMonth = getPreviousMonth(currentDisplayedMonth);
 			currentDisplayedMonth = previousMonth;
-			updateMonthDisplay(currentDisplayedMonth, seasonData, onlyFreiland);
+			updateMonthDisplay(currentDisplayedMonth, seasonData, filterMode);
 		});
 
 		nextButton.addEventListener("click", () => {
 			const nextMonth = getNextMonth(currentDisplayedMonth);
 			currentDisplayedMonth = nextMonth;
-			updateMonthDisplay(currentDisplayedMonth, seasonData, onlyFreiland);
+			updateMonthDisplay(currentDisplayedMonth, seasonData, filterMode);
 		});
 
-		if (SHOW_SEASON_FILTER && allButton && freilandButton) {
+		if (SHOW_SEASON_FILTER && allButton && freilandButton && lagerButton) {
 			allButton.addEventListener("click", () => {
-				onlyFreiland = false;
-				updateMonthDisplay(currentDisplayedMonth, seasonData, onlyFreiland);
+				filterMode = "all";
+				updateMonthDisplay(currentDisplayedMonth, seasonData, filterMode);
 			});
 
 			freilandButton.addEventListener("click", () => {
-				onlyFreiland = true;
-				updateMonthDisplay(currentDisplayedMonth, seasonData, onlyFreiland);
+				filterMode = "freiland";
+				updateMonthDisplay(currentDisplayedMonth, seasonData, filterMode);
+			});
+
+			lagerButton.addEventListener("click", () => {
+				filterMode = "lager";
+				updateMonthDisplay(currentDisplayedMonth, seasonData, filterMode);
 			});
 		}
-	});
+	}
+
+	document.addEventListener("DOMContentLoaded", initSeasonCalendar);
+	document.addEventListener("astro:page-load", initSeasonCalendar);
 </script>
 
 <style>

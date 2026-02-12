@@ -1,7 +1,5 @@
 ---
-import LanguageSelector from "@components/LanguageSelector.astro";
 import HeaderLink from "@components/Link.astro";
-import ThemeSelector from "@components/ThemeSelector.astro";
 import { PAGES, SITE_TITLE } from "@src/consts";
 import { localizePath } from "@utils/t.ts";
 import { tFn } from "@utils/t.ts";
@@ -30,10 +28,6 @@ const t = tFn(Astro.url);
 						{t(item.title)}
 					</HeaderLink>
 				))}
-				<div class="flex items-center pl-4 border-l border-stone-200 ml-4 space-x-6">
-					<LanguageSelector />
-					<ThemeSelector />
-				</div>
 			</nav>
 
 			<!-- Mobile menu button -->
@@ -65,10 +59,6 @@ const t = tFn(Astro.url);
 					{t(item.title)}
 				</HeaderLink>
 			))}
-			<div class="pt-4 flex items-center justify-between border-t border-stone-50">
-				<LanguageSelector />
-				<ThemeSelector />
-			</div>
 		</div>
 	</div>
 </header>
