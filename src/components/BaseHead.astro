@@ -19,9 +19,8 @@ interface Props {
 
 const locale = getLocale(Astro.url);
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const resolvedImageWithDomain = new URL("/meta/opengraph.png", Astro.site).toString();
-
-const { title = SITE_TITLE, description = SITE_DESCRIPTION, image = "/blog-placeholder-1.jpg" } = Astro.props;
+const { title = SITE_TITLE, description = SITE_DESCRIPTION, image = "/logo.svg" } = Astro.props as Props;
+const resolvedImageWithDomain = new URL(image, Astro.site).toString();
 ---
 
 <!-- Global Metadata -->
@@ -77,13 +76,7 @@ const { title = SITE_TITLE, description = SITE_DESCRIPTION, image = "/blog-place
 			{
 				name: "viewport",
 				content: "width=device-width,initial-scale=1",
-			},
-			{
-				name: "twitter:image",
-				content: "https://user-images.githubusercontent.com/5182256/131216951-8f74f425-f775-463d-a11b-0e01ad9fce8d.png",
-			},
-			{ name: "twitter:title", content: "Tinker Tailor Soldier Spy" },
-			{ name: "twitter:description", content: "Agent" },
+			}
 		],
 	}}
 />

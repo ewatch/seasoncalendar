@@ -1,5 +1,5 @@
 ---
-import translations, { localizePath } from "@utils/t.ts";
+import { localizePath } from "@utils/t.ts";
 import Link from "@components/Link.astro";
 
 export interface Props {
@@ -11,9 +11,8 @@ export interface Props {
 }
 
 const url = Astro.url;
-const t = translations(url);
 
-const { prevUrl, nextUrl, prevText = "blog.prev", nextText = "blog.next", class: className } = Astro.props;
+const { prevUrl, nextUrl, prevText = "Prev", nextText = "Next", class: className } = Astro.props;
 ---
 
 {
@@ -22,12 +21,12 @@ const { prevUrl, nextUrl, prevText = "blog.prev", nextText = "blog.next", class:
 			<div class="flex flex-row mx-auto container justify-center gap-8">
 				<Link href={localizePath(prevUrl, url)} style="muted" class={`${!prevUrl ? "invisible" : ""}`}>
 					<div class="flex flex-row align-middle">
-						<p class="ml-2">Prev</p>
+						<p class="ml-2">{prevText}</p>
 					</div>
 				</Link>
 				<Link href={localizePath(nextUrl, url)} style="muted" class={`${!nextUrl ? "invisible" : ""}`}>
 					<div class="flex flex-row align-middle">
-						<span class="mr-2">Next</span>
+						<span class="mr-2">{nextText}</span>
 					</div>
 				</Link>
 			</div>

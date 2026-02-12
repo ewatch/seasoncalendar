@@ -1,7 +1,7 @@
 ---
 import Layout from "@layouts/Layout.astro";
 import BlogHeader from "@components/blog/BlogHeader.astro";
-import { DEFAULT_LOCALE } from "@src/consts";
+import { BLOG_FALLBACK_LOCALE, DEFAULT_LOCALE } from "@src/consts";
 import { getCollection } from "astro:content";
 import type { CollectionEntry } from "astro:content";
 import { getLocale, getLocaleUrlPrefix } from "astro-i18n-aut";
@@ -11,11 +11,15 @@ import HeroImage from "@src/components/blog/HeroImage.astro";
 const locale = getLocale(Astro.url) ?? DEFAULT_LOCALE;
 const localeUrlPrefix = getLocaleUrlPrefix(Astro.url);
 
-const posts = (await getCollection("blog", (entry) => entry.slug.startsWith(`${locale}/`)))
+const localePosts = await getCollection("blog", (entry) => entry.slug.startsWith(`${locale}/`));
+const fallbackPosts = await getCollection("blog", (entry) => entry.slug.startsWith(`${BLOG_FALLBACK_LOCALE}/`));
+
+const posts = (localePosts.length > 0 ? localePosts : fallbackPosts)
 	.sort((a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf())
 	.map<CollectionEntry<"blog"> & { href: string }>((post) => {
+		const postLocale = post.slug.split("/")[0] ?? BLOG_FALLBACK_LOCALE;
 		return {
-			href: localeUrlPrefix + "/blog" + post.slug.replace(locale, "") + "/",
+			href: localeUrlPrefix + "/blog" + post.slug.replace(`${postLocale}/`, "") + "/",
 			...post,
 		};
 	});
@@ -25,7 +29,7 @@ const posts = (await getCollection("blog", (entry) => entry.slug.startsWith(`${l
 	<Container class="pt-16">
 		<ul class="m-0 grid list-none grid-cols-2 gap-6 p-0">
 			{
-				posts.map((post: any, index: number) => (
+				posts.map((post, index) => (
 					<li class={`${index === 0 ? "col-span-2 mb-4 w-full text-center" : ""}`}>
 						<a href={post.href} class="block transition-colors duration-200">
 							<HeroImage

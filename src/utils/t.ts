@@ -8,14 +8,25 @@ import { getLocale } from "astro-i18n-aut";
 import de from "@src/locales/de/de.json";
 import it from "@locales/it.json";
 
-const handler = {
-	get(target: any, prop: any, receiver: any) {
-		return target[prop].replaceAll("\n", "<br/>");
+type TranslationMap = Record<string, string>;
+
+const handler: ProxyHandler<TranslationMap> = {
+	get(target, prop) {
+		if (typeof prop !== "string") {
+			return "";
+		}
+
+		const value = target[prop];
+		if (typeof value !== "string") {
+			return "";
+		}
+
+		return value.replaceAll("\n", "<br/>");
 	},
 };
 
-const it_proxy = new Proxy(it, handler);
-const en_proxy = new Proxy(de, handler);
+const deProxy = new Proxy(de as TranslationMap, handler) as unknown as Locales;
+const itProxy = new Proxy(it as TranslationMap, handler) as unknown as Locales;
 
 export const defaultLocale = DEFAULT_LOCALE;
 export const locales = LOCALES;
@@ -30,28 +41,28 @@ export default function t(astroUrl: URL): Locales {
 
 	switch (locale) {
 		case "it":
-			return it_proxy as Locales;
+			return itProxy;
 		default:
-			return en_proxy as Locales;
+			return deProxy;
 	}
 }
 
 export function tFn(astroUrl: URL) {
 	const locale = getLocale(astroUrl);
-	let translations: any;
+	let translations: Locales;
 
 	switch (locale) {
 		case "it":
-			translations = it_proxy;
+			translations = itProxy;
 			break;
 		default:
-			translations = en_proxy;
+			translations = deProxy;
 			break;
 	}
 
 	return (key: string): string => {
 		if (key in translations) {
-			return translations[key];
+			return translations[key as keyof Locales];
 		}
 		console.warn(`Missing translation key: ${key}`);
 		return key;
@@ -64,15 +75,11 @@ export function tFn(astroUrl: URL) {
  * @param astroUrl
  * @returns
  */
-export function localizePath(
-	link: string | URL,
-	astroUrl: string | URL,
-): string {
+export function localizePath(link: string | URL, astroUrl: string | URL): string {
 	const locale = getLocale(astroUrl);
 	let localizedLink = "";
 	if (locale && locale !== defaultLocale) {
-		const localeLink =
-			`/${getLocale(astroUrl) ?? ""}/${link}`.replaceAll("//", "/") ?? "";
+		const localeLink = `/${getLocale(astroUrl) ?? ""}/${link}`.replaceAll("//", "/") ?? "";
 		localizedLink = localeLink;
 	} else {
 		localizedLink = String(link);

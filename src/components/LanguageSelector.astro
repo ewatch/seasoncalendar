@@ -15,8 +15,8 @@ const urlWithoutLocalePrefix = getUrlWithoutLocale(Astro.url);
 	document.addEventListener("alpine:init", () => {
 		Alpine.data("dropdownData", () => ({
 			currentLocale: "${currentLocale}",
-			changePage(event: any) {
-				const newLocaleUrl = event.target.value;
+			changePage(event: Event) {
+				const newLocaleUrl = (event.target as HTMLSelectElement).value;
 				navigate(newLocaleUrl);
 			},
 		}));
@@ -30,7 +30,7 @@ const urlWithoutLocalePrefix = getUrlWithoutLocale(Astro.url);
 	x-on:change="changePage($event)">
 	{
 		locales.map((locale) => (
-			<option value={`/${locale}${urlWithoutLocalePrefix}`} selected={locale === currentLocale}>
+			<option value={locale === DEFAULT_LOCALE ? urlWithoutLocalePrefix : `/${locale}${urlWithoutLocalePrefix}`} selected={locale === currentLocale}>
 				{locale}
 			</option>
 		))

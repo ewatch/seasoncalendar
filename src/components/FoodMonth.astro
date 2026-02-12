@@ -1,6 +1,6 @@
 ---
 import foodData from "@locales/de/food-calendar.json";
-import { getAvailableInMonth, getCurrentMonth, getCurrentMonthDisplayName } from "@src/utils/foodFilter.js";
+import { getAvailableInMonth, getCurrentMonth, getCurrentMonthDisplayName } from "@src/utils/foodFilter";
 
 // Initial (current) month determined at build time – used for initial render only.
 const currentMonth = getCurrentMonth();
@@ -41,7 +41,7 @@ const food = getAvailableInMonth(foodData, currentMonth);
                 <h3 class="text-xl md:text-2xl font-bold text-green-800">Gemüse</h3>
             </div>
             <ul id="vegetables-list" class="space-y-2">
-                {food.vegetables.map((vegetable: any) => (
+                {food.vegetables.map((vegetable) => (
                     <li class="text-gray-700">{vegetable.details.icon} {vegetable.name}</li>
                 ))}
             </ul>
@@ -90,5 +90,78 @@ const food = getAvailableInMonth(foodData, currentMonth);
 
 <!-- Embed the full food data for client-side navigation -->
 <!-- Embedded season data for client-side month navigation -->
-<script type="application/json" id="food-data" set:html={JSON.stringify(foodData)}></script>
-<script type="module" src="/foodMonthNav.js"></script>
+<script is:inline type="application/json" id="food-data" set:html={JSON.stringify(foodData)}></script>
+<script>
+	import { getAvailableInMonth, getCurrentMonth, getMonthDisplayName, getNextMonth, getPreviousMonth, getYearForMonth } from "@src/utils/foodFilter";
+
+	function updateList<T>(listElement: HTMLElement | null, items: T[], renderText: (item: T) => string): void {
+		if (!listElement) {
+			return;
+		}
+
+		listElement.innerHTML = "";
+		items.forEach((item) => {
+			const li = document.createElement("li");
+			li.className = "text-gray-700";
+			li.textContent = renderText(item);
+			listElement.appendChild(li);
+		});
+	}
+
+	function updateMonthDisplay(monthAbbr: string, year: number, seasonData: Parameters<typeof getAvailableInMonth>[0]): void {
+		const monthTitle = document.getElementById("month-title");
+		if (monthTitle) {
+			monthTitle.textContent = `${getMonthDisplayName(monthAbbr)} ${year}`;
+		}
+
+		const food = getAvailableInMonth(seasonData, monthAbbr);
+
+		updateList(document.getElementById("vegetables-list"), food.vegetables, (vegetable) => `${vegetable.details.icon} ${vegetable.name}`.trim());
+		updateList(document.getElementById("fruits-list"), food.fruits, (fruit) => fruit);
+		updateList(document.getElementById("herbs-list"), food.herbs, (herb) => herb);
+		updateList(document.getElementById("salads-list"), food.salads, (salad) => salad);
+	}
+
+	document.addEventListener("DOMContentLoaded", () => {
+		const foodDataScript = document.getElementById("food-data");
+		if (!foodDataScript) {
+			return;
+		}
+
+		const textContent = foodDataScript.textContent || "";
+		if (!textContent.trim()) {
+			return;
+		}
+
+		let seasonData: Parameters<typeof getAvailableInMonth>[0];
+		try {
+			seasonData = JSON.parse(textContent) as Parameters<typeof getAvailableInMonth>[0];
+		} catch {
+			return;
+		}
+
+		let currentDisplayedMonth = getCurrentMonth();
+		let currentDisplayedYear = new Date().getFullYear();
+
+		const prevButton = document.getElementById("prev-month");
+		const nextButton = document.getElementById("next-month");
+
+		if (!prevButton || !nextButton) {
+			return;
+		}
+
+		prevButton.addEventListener("click", () => {
+			const previousMonth = getPreviousMonth(currentDisplayedMonth);
+			currentDisplayedYear = getYearForMonth(previousMonth, currentDisplayedMonth, currentDisplayedYear);
+			currentDisplayedMonth = previousMonth;
+			updateMonthDisplay(currentDisplayedMonth, currentDisplayedYear, seasonData);
+		});
+
+		nextButton.addEventListener("click", () => {
+			const nextMonth = getNextMonth(currentDisplayedMonth);
+			currentDisplayedYear = getYearForMonth(nextMonth, currentDisplayedMonth, currentDisplayedYear);
+			currentDisplayedMonth = nextMonth;
+			updateMonthDisplay(currentDisplayedMonth, currentDisplayedYear, seasonData);
+		});
+	});
+</script>

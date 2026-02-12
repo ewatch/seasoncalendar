@@ -1,6 +1,6 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import { getLocale, getLocaleUrlPrefix } from "astro-i18n-aut";
+import { getLocaleUrlPrefix } from "astro-i18n-aut";
 
 const localeUrlPrefix = getLocaleUrlPrefix(Astro.url);
 ---
@@ -11,11 +11,16 @@ const localeUrlPrefix = getLocaleUrlPrefix(Astro.url);
 			<div class="max-w-md text-center">
 				<h2 class="mb-8 text-9xl font-bold">
 					<span class="sr-only">Error</span>
-					<span class="text-primary">404</span>
+					<span class="text-lima-700">404</span>
 				</h2>
 				<p class="text-3xl font-semibold md:text-3xl">Sorry, we couldn't find this page.</p>
-				<p class="text-muted mb-8 mt-4 text-lg dark:text-slate-400">But dont worry, you can find plenty of other things on our homepage.</p>
-				<a rel="noopener noreferrer" href={localeUrlPrefix || "/"} class="btn ml-4">Back to homepage</a>
+				<p class="mb-8 mt-4 text-lg text-stone-600 dark:text-slate-400">But dont worry, you can find plenty of other things on our homepage.</p>
+				<a
+					rel="noopener noreferrer"
+					href={localeUrlPrefix || "/"}
+					class="inline-block rounded border border-lima-300 px-4 py-2 font-medium text-lima-800 transition-colors hover:bg-lima-100">
+					Back to homepage
+				</a>
 			</div>
 		</div>
 	</section>

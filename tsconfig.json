@@ -14,5 +14,6 @@
 			"@assets/*": ["assets/*"],
 			"@locales/*": ["locales/*"]
 		}
-	}
+	},
+	"exclude": ["dist", "node_modules"]
 }
