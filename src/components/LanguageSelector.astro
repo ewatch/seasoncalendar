@@ -14,7 +14,6 @@ const urlWithoutLocalePrefix = getUrlWithoutLocale(Astro.url);
 
 	document.addEventListener("alpine:init", () => {
 		Alpine.data("dropdownData", () => ({
-			currentLocale: "${currentLocale}",
 			changePage(event: Event) {
 				const newLocaleUrl = (event.target as HTMLSelectElement).value;
 				navigate(newLocaleUrl);
@@ -23,16 +22,22 @@ const urlWithoutLocalePrefix = getUrlWithoutLocale(Astro.url);
 	});
 </script>
 
-<select
-	aria-label="Change language"
-	class="cursor-pointer focus-visible:outline-none dark:bg-stone-800 dark:text-stone-50"
-	x-data="dropdownData"
-	x-on:change="changePage($event)">
-	{
-		locales.map((locale) => (
-			<option value={locale === DEFAULT_LOCALE ? urlWithoutLocalePrefix : `/${locale}${urlWithoutLocalePrefix}`} selected={locale === currentLocale}>
-				{locale}
-			</option>
-		))
-	}
-</select>
+<div class="relative inline-flex items-center" x-data="dropdownData">
+	<select
+		aria-label="Change language"
+		class="appearance-none bg-transparent text-[10px] uppercase tracking-widest text-stone-400 hover:text-stone-900 focus:outline-none cursor-pointer pr-4 transition-colors font-medium"
+		x-on:change="changePage($event)">
+		{
+			locales.map((locale) => (
+				<option value={locale === DEFAULT_LOCALE ? urlWithoutLocalePrefix : `/${locale}${urlWithoutLocalePrefix}`} selected={locale === currentLocale}>
+					{locale}
+				</option>
+			))
+		}
+	</select>
+    <div class="absolute right-0 pointer-events-none text-stone-300">
+        <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </div>
+</div>

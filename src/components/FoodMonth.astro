@@ -2,166 +2,212 @@
 import foodData from "@locales/de/food-calendar.json";
 import { getAvailableInMonth, getCurrentMonth, getCurrentMonthDisplayName } from "@src/utils/foodFilter";
 
-// Initial (current) month determined at build time – used for initial render only.
+// Initial (current) month determined at build time
 const currentMonth = getCurrentMonth();
 const currentMonthDisplayName = getCurrentMonthDisplayName();
-const currentYear = new Date().getFullYear();
 const food = getAvailableInMonth(foodData, currentMonth);
 ---
 
-<div class="max-w-6xl mx-auto p-6">
+<div class="max-w-5xl mx-auto px-4 py-8 md:py-12 sm:px-6 lg:px-8 bg-paper min-h-screen">
     <!-- Header Section -->
-    <div class="text-center mb-8">
-        <h1 class="text-4xl md:text-5xl font-bold text-lima-900 mb-2">
-            Saisonkalender
+    <header class="mb-12 md:mb-16 text-center">
+        <span class="inline-block text-stone-500 uppercase tracking-[0.2em] text-[10px] md:text-xs font-semibold mb-4">
+            Der Saisonale Kalender
+        </span>
+        <h1 class="text-4xl sm:text-5xl md:text-7xl font-serif text-stone-900 mb-6 md:mb-8 leading-tight">
+            Was wächst im <span id="month-title-main" class="italic text-lima-800">{currentMonthDisplayName}</span>?
         </h1>
-        <div class="flex items-center justify-center gap-4 mb-4" aria-live="polite">
-            <button id="prev-month" type="button" class="px-3 py-2 rounded border border-lima-300 text-lima-700 hover:bg-lima-100 focus:outline-none focus:ring-2 focus:ring-lima-400" aria-label="Vorheriger Monat">
-                ←
+        
+        <div class="flex items-center justify-between sm:justify-center gap-4 sm:gap-8 border-y border-stone-200 py-4 md:py-6">
+            <button id="prev-month" type="button" class="group flex items-center gap-2 text-stone-400 hover:text-stone-900 transition-colors" aria-label="Vorheriger Monat">
+                <span class="text-xl md:text-2xl group-hover:-translate-x-1 transition-transform">←</span>
+                <span class="hidden sm:inline text-xs font-medium uppercase tracking-wider">Zurück</span>
             </button>
-            <h2 id="month-title" class="text-2xl md:text-3xl font-semibold text-lima-700">
-                {currentMonthDisplayName} {currentYear}
-            </h2>
-            <button id="next-month" type="button" class="px-3 py-2 rounded border border-lima-300 text-lima-700 hover:bg-lima-100 focus:outline-none focus:ring-2 focus:ring-lima-400" aria-label="Nächster Monat">
-                →
+            
+            <div id="month-title" class="text-base md:text-lg font-serif italic text-stone-600 min-w-[120px] md:min-w-[150px]">
+                {currentMonthDisplayName}
+            </div>
+
+            <button id="next-month" type="button" class="group flex items-center gap-2 text-stone-400 hover:text-stone-900 transition-colors" aria-label="Nächster Monat">
+                <span class="hidden sm:inline text-xs font-medium uppercase tracking-wider">Weiter</span>
+                <span class="text-xl md:text-2xl group-hover:translate-x-1 transition-transform">→</span>
             </button>
         </div>
-        <p class="text-lima-600 text-lg">
-            Frische, saisonale Produkte für diesen Monat
-        </p>
-    </div>
+    </header>
 
     <!-- Categories Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 lg:gap-8">
         
-        <!-- Vegetables Card -->
-        <div class="bg-green-50 border-2 border-green-200 rounded-lg p-6" data-category="vegetables">
-            <div class="flex items-center mb-4">
-                <span class="text-2xl mr-3">🥕</span>
-                <h3 class="text-xl md:text-2xl font-bold text-green-800">Gemüse</h3>
+        <!-- Vegetables -->
+        <section class="flex flex-col" data-category="vegetables">
+            <div class="flex items-baseline gap-3 mb-6 border-b border-stone-100 pb-2">
+                <span class="text-stone-300 font-serif italic text-2xl">01</span>
+                <h3 class="text-xl font-serif text-stone-800">Gemüse</h3>
             </div>
-            <ul id="vegetables-list" class="space-y-2">
+            <ul id="vegetables-list" class="grid grid-cols-2 md:grid-cols-1 gap-y-3 gap-x-4">
                 {food.vegetables.map((vegetable) => (
-                    <li class="text-gray-700">{vegetable.details.icon} {vegetable.name}</li>
+                    <li class="flex items-center gap-3 text-stone-600 group hover:text-lima-800 transition-colors cursor-default">
+                        <span class="opacity-40 group-hover:opacity-100 transition-opacity shrink-0">{vegetable.details.icon}</span>
+                        <span class="text-sm tracking-wide truncate">{vegetable.name}</span>
+                    </li>
                 ))}
             </ul>
-        </div>
+        </section>
 
-        <!-- Fruits Card -->
-        <div class="bg-orange-50 border-2 border-orange-200 rounded-lg p-6" data-category="fruits">
-            <div class="flex items-center mb-4">
-                <span class="text-2xl mr-3">🍎</span>
-                <h3 class="text-xl md:text-2xl font-bold text-orange-800">Obst</h3>
+        <!-- Fruits -->
+        <section class="flex flex-col" data-category="fruits">
+            <div class="flex items-baseline gap-3 mb-6 border-b border-stone-100 pb-2">
+                <span class="text-stone-300 font-serif italic text-2xl">02</span>
+                <h3 class="text-xl font-serif text-stone-800">Obst</h3>
             </div>
-            <ul id="fruits-list" class="space-y-2">
+            <ul id="fruits-list" class="grid grid-cols-2 md:grid-cols-1 gap-y-3 gap-x-4">
                 {food.fruits.map((fruit: string) => (
-                    <li class="text-gray-700">{fruit}</li>
+                    <li class="flex items-center gap-3 text-stone-600 group hover:text-lima-800 transition-colors cursor-default">
+                        <span class="w-1.5 h-1.5 rounded-full bg-stone-200 group-hover:bg-lima-400 transition-colors shrink-0"></span>
+                        <span class="text-sm tracking-wide truncate">{fruit}</span>
+                    </li>
                 ))}
             </ul>
-        </div>
+        </section>
 
-        <!-- Herbs Card -->
-        <div class="bg-emerald-50 border-2 border-emerald-200 rounded-lg p-6" data-category="herbs">
-            <div class="flex items-center mb-4">
-                <span class="text-2xl mr-3">🌿</span>
-                <h3 class="text-xl md:text-2xl font-bold text-emerald-800">Kräuter</h3>
+        <!-- Salads -->
+        <section class="flex flex-col" data-category="salads">
+            <div class="flex items-baseline gap-3 mb-6 border-b border-stone-100 pb-2">
+                <span class="text-stone-300 font-serif italic text-2xl">03</span>
+                <h3 class="text-xl font-serif text-stone-800">Salate</h3>
             </div>
-            <ul id="herbs-list" class="space-y-2">
-                {food.herbs.map((herb: string) => (
-                    <li class="text-gray-700">{herb}</li>
-                ))}
-            </ul>
-        </div>
-
-        <!-- Salads Card -->
-        <div class="bg-lime-50 border-2 border-lime-200 rounded-lg p-6" data-category="salads">
-            <div class="flex items-center mb-4">
-                <span class="text-2xl mr-3">🥬</span>
-                <h3 class="text-xl md:text-2xl font-bold text-lime-800">Salat</h3>
-            </div>
-            <ul id="salads-list" class="space-y-2">
+            <ul id="salads-list" class="grid grid-cols-2 md:grid-cols-1 gap-y-3 gap-x-4">
                 {food.salads.map((salad: string) => (
-                    <li class="text-gray-700">{salad}</li>
+                    <li class="flex items-center gap-3 text-stone-600 group hover:text-lima-800 transition-colors cursor-default">
+                        <span class="w-1.5 h-1.5 rounded-full bg-stone-200 group-hover:bg-lima-400 transition-colors shrink-0"></span>
+                        <span class="text-sm tracking-wide truncate">{salad}</span>
+                    </li>
                 ))}
             </ul>
-        </div>
+        </section>
+
+        <!-- Herbs -->
+        <section class="flex flex-col" data-category="herbs">
+            <div class="flex items-baseline gap-3 mb-6 border-b border-stone-100 pb-2">
+                <span class="text-stone-300 font-serif italic text-2xl">04</span>
+                <h3 class="text-xl font-serif text-stone-800">Kräuter</h3>
+            </div>
+            <ul id="herbs-list" class="grid grid-cols-2 md:grid-cols-1 gap-y-3 gap-x-4">
+                {food.herbs.map((herb: string) => (
+                    <li class="flex items-center gap-3 text-stone-600 group hover:text-lima-800 transition-colors cursor-default">
+                        <span class="w-1.5 h-1.5 rounded-full bg-stone-200 group-hover:bg-lima-400 transition-colors shrink-0"></span>
+                        <span class="text-sm tracking-wide truncate">{herb}</span>
+                    </li>
+                ))}
+            </ul>
+        </section>
     </div>
+
+    <!-- Empty State / Note -->
+    <footer class="mt-24 pt-12 border-t border-stone-100 text-center">
+        <p class="text-stone-400 text-xs uppercase tracking-widest leading-relaxed max-w-lg mx-auto">
+            Genießen Sie, was die Natur uns schenkt. Saisonaler Konsum unterstützt lokale Bauern und schützt unsere Umwelt.
+        </p>
+    </footer>
 </div>
 
-<!-- Embed the full food data for client-side navigation -->
-<!-- Embedded season data for client-side month navigation -->
 <script is:inline type="application/json" id="food-data" set:html={JSON.stringify(foodData)}></script>
-<script>
-	import { getAvailableInMonth, getCurrentMonth, getMonthDisplayName, getNextMonth, getPreviousMonth, getYearForMonth } from "@src/utils/foodFilter";
 
-	function updateList<T>(listElement: HTMLElement | null, items: T[], renderText: (item: T) => string): void {
-		if (!listElement) {
-			return;
-		}
+<script>
+	import { getAvailableInMonth, getCurrentMonth, getMonthDisplayName, getNextMonth, getPreviousMonth } from "@src/utils/foodFilter";
+
+	function updateList<T>(listElement: HTMLElement | null, items: T[], renderFn: (item: T) => string): void {
+		if (!listElement) return;
 
 		listElement.innerHTML = "";
+        
+        if (items.length === 0) {
+            const li = document.createElement("li");
+            li.className = "text-stone-400 text-xs italic col-span-2";
+            li.textContent = "Keine Auswahl verfügbar";
+            listElement.appendChild(li);
+            return;
+        }
+
 		items.forEach((item) => {
 			const li = document.createElement("li");
-			li.className = "text-gray-700";
-			li.textContent = renderText(item);
+			li.className = "flex items-center gap-3 text-stone-600 group hover:text-lima-800 transition-colors cursor-default";
+			li.innerHTML = renderFn(item);
 			listElement.appendChild(li);
 		});
 	}
 
-	function updateMonthDisplay(monthAbbr: string, year: number, seasonData: Parameters<typeof getAvailableInMonth>[0]): void {
+	function updateMonthDisplay(monthAbbr: string, seasonData: Parameters<typeof getAvailableInMonth>[0]): void {
 		const monthTitle = document.getElementById("month-title");
+        const monthTitleMain = document.getElementById("month-title-main");
+        const displayName = getMonthDisplayName(monthAbbr);
+        
 		if (monthTitle) {
-			monthTitle.textContent = `${getMonthDisplayName(monthAbbr)} ${year}`;
+			monthTitle.textContent = displayName;
 		}
+        if (monthTitleMain) {
+            monthTitleMain.textContent = displayName;
+        }
 
 		const food = getAvailableInMonth(seasonData, monthAbbr);
 
-		updateList(document.getElementById("vegetables-list"), food.vegetables, (vegetable) => `${vegetable.details.icon} ${vegetable.name}`.trim());
-		updateList(document.getElementById("fruits-list"), food.fruits, (fruit) => fruit);
-		updateList(document.getElementById("herbs-list"), food.herbs, (herb) => herb);
-		updateList(document.getElementById("salads-list"), food.salads, (salad) => salad);
+		updateList(document.getElementById("vegetables-list"), food.vegetables, (v) => `
+            <span class="opacity-40 group-hover:opacity-100 transition-opacity shrink-0">${v.details.icon}</span>
+            <span class="text-sm tracking-wide truncate">${v.name}</span>
+        `);
+		updateList(document.getElementById("fruits-list"), food.fruits, (f) => `
+            <span class="w-1.5 h-1.5 rounded-full bg-stone-200 group-hover:bg-lima-400 transition-colors shrink-0"></span>
+            <span class="text-sm tracking-wide truncate">${f}</span>
+        `);
+		updateList(document.getElementById("herbs-list"), food.herbs, (h) => `
+            <span class="w-1.5 h-1.5 rounded-full bg-stone-200 group-hover:bg-lima-400 transition-colors shrink-0"></span>
+            <span class="text-sm tracking-wide truncate">${h}</span>
+        `);
+		updateList(document.getElementById("salads-list"), food.salads, (s) => `
+            <span class="w-1.5 h-1.5 rounded-full bg-stone-200 group-hover:bg-lima-400 transition-colors shrink-0"></span>
+            <span class="text-sm tracking-wide truncate">${s}</span>
+        `);
 	}
 
 	document.addEventListener("DOMContentLoaded", () => {
 		const foodDataScript = document.getElementById("food-data");
-		if (!foodDataScript) {
-			return;
-		}
+		if (!foodDataScript) return;
 
 		const textContent = foodDataScript.textContent || "";
-		if (!textContent.trim()) {
-			return;
-		}
+		if (!textContent.trim()) return;
 
-		let seasonData: Parameters<typeof getAvailableInMonth>[0];
+		let seasonData: any;
 		try {
-			seasonData = JSON.parse(textContent) as Parameters<typeof getAvailableInMonth>[0];
+			seasonData = JSON.parse(textContent);
 		} catch {
 			return;
 		}
 
 		let currentDisplayedMonth = getCurrentMonth();
-		let currentDisplayedYear = new Date().getFullYear();
-
 		const prevButton = document.getElementById("prev-month");
 		const nextButton = document.getElementById("next-month");
 
-		if (!prevButton || !nextButton) {
-			return;
-		}
+		if (!prevButton || !nextButton) return;
+
+		updateMonthDisplay(currentDisplayedMonth, seasonData);
 
 		prevButton.addEventListener("click", () => {
 			const previousMonth = getPreviousMonth(currentDisplayedMonth);
-			currentDisplayedYear = getYearForMonth(previousMonth, currentDisplayedMonth, currentDisplayedYear);
 			currentDisplayedMonth = previousMonth;
-			updateMonthDisplay(currentDisplayedMonth, currentDisplayedYear, seasonData);
+			updateMonthDisplay(currentDisplayedMonth, seasonData);
 		});
 
 		nextButton.addEventListener("click", () => {
 			const nextMonth = getNextMonth(currentDisplayedMonth);
-			currentDisplayedYear = getYearForMonth(nextMonth, currentDisplayedMonth, currentDisplayedYear);
 			currentDisplayedMonth = nextMonth;
-			updateMonthDisplay(currentDisplayedMonth, currentDisplayedYear, seasonData);
+			updateMonthDisplay(currentDisplayedMonth, seasonData);
 		});
 	});
 </script>
+
+<style>
+    /* Custom serif flourishes if needed */
+    .font-serif {
+        font-family: Georgia, serif;
+    }
+</style>

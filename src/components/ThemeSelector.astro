@@ -1,32 +1,39 @@
-<select
-	x-data={`{
-				theme: localStorage.theme || 'system',
-				updateDocumentClassTheme: function() {
-					if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-						document.documentElement.classList.add('dark');
-					} else {
-						document.documentElement.classList.remove('dark');
-					}
-				},
-				switchTheme: function (newValue) {
-					if (newValue == 'dark') {
-						localStorage.theme = 'dark';
-					} else if (newValue == 'light') {
-						localStorage.theme = 'light';
-					} else {
-						localStorage.removeItem('theme');
-					}
-					this.updateDocumentClassTheme();
-				},
-			}`}
-	aria-label="Theme selector"
-	name="theme-selector"
-	id="theme-selector"
-	class="dark:stone-50 cursor-pointer focus-visible:outline-none dark:bg-stone-800"
-	x-init="updateDocumentClassTheme()"
-	x-model="theme"
-	@change="switchTheme($event.target.value)">
-	<option value="system">System</option>
-	<option value="dark">Dark</option>
-	<option value="light">Light</option>
-</select>
+<div class="relative inline-flex items-center">
+    <select
+        x-data={`{
+            theme: localStorage.theme || 'system',
+            updateDocumentClassTheme: function() {
+                if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            },
+            switchTheme: function (newValue) {
+                if (newValue == 'dark') {
+                    localStorage.theme = 'dark';
+                } else if (newValue == 'light') {
+                    localStorage.theme = 'light';
+                } else {
+                    localStorage.removeItem('theme');
+                }
+                this.updateDocumentClassTheme();
+            },
+        }`}
+        aria-label="Theme selector"
+        name="theme-selector"
+        id="theme-selector"
+        class="appearance-none bg-transparent text-[10px] uppercase tracking-widest text-stone-400 hover:text-stone-900 focus:outline-none cursor-pointer pr-4 transition-colors font-medium"
+        x-init="updateDocumentClassTheme()"
+        x-model="theme"
+        @change="switchTheme($event.target.value)">
+        <option value="system">Auto</option>
+        <option value="dark">Dark</option>
+        <option value="light">Light</option>
+    </select>
+    <div class="absolute right-0 pointer-events-none text-stone-300">
+        <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+    </div>
+</div>
