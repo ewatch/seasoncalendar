@@ -1,0 +1,45 @@
+name: Monthly Redeploy
+
+on:
+    schedule:
+        - cron: "0 3 1 * *"
+    workflow_dispatch:
+
+permissions:
+    contents: write
+
+concurrency:
+    group: monthly-redeploy
+    cancel-in-progress: false
+
+jobs:
+    redeploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: 20
+                  cache: npm
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Verify build
+              run: npm run build
+
+            - name: Create monthly redeploy commit
+              run: |
+                  DATE="$(date -u +'%Y-%m-%d')"
+                  git config user.name "github-actions[bot]"
+                  git config user.email "github-actions[bot]@users.noreply.github.com"
+                  git commit --allow-empty -m "chore: monthly redeploy (${DATE})"
+
+            - name: Push commit
+              run: git push

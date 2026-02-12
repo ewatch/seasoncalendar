@@ -25,6 +25,14 @@ npm run preview
 
 `npm run build` runs Astro type checks, generates PWA assets, and builds the production site.
 
+## Monthly auto redeploy
+
+The repository includes `.github/workflows/monthly-redeploy.yml`.
+
+-   Runs automatically on the 1st day of each month at 03:00 UTC.
+-   Can also be triggered manually via GitHub Actions (`workflow_dispatch`).
+-   Verifies `npm run build`, then pushes an empty commit to trigger your deployment pipeline.
+
 ## Project structure
 
 -   `src/components/`: reusable Astro components

@@ -13,11 +13,23 @@ type FoodData = {
 	availability: FoodAvailability;
 };
 
+type AvailabilityType = "freiland" | "lager" | "both";
+
+type AvailableFoodItem = {
+	name: string;
+	details: FoodItem;
+	availabilityType: AvailabilityType;
+};
+
 type AvailableInMonth = {
-	vegetables: Array<{ name: string; details: FoodItem }>;
-	fruits: string[];
-	herbs: string[];
-	salads: string[];
+	vegetables: AvailableFoodItem[];
+	fruits: AvailableFoodItem[];
+	herbs: AvailableFoodItem[];
+	salads: AvailableFoodItem[];
+};
+
+type GetAvailableOptions = {
+	onlyFreiland?: boolean;
 };
 
 const monthAliasMap: Record<string, MonthAbbreviation> = {
@@ -37,8 +49,9 @@ const monthAliasMap: Record<string, MonthAbbreviation> = {
 	DEZ: "DEZ",
 };
 
-export const getAvailableInMonth = function (data: FoodData, month: string): AvailableInMonth {
+export const getAvailableInMonth = function (data: FoodData, month: string, options: GetAvailableOptions = {}): AvailableInMonth {
 	const normalizedMonth = normalizeMonthAbbreviation(month);
+	const onlyFreiland = options.onlyFreiland === true;
 	const availableInMonth: AvailableInMonth = {
 		vegetables: [],
 		fruits: [],
@@ -49,31 +62,42 @@ export const getAvailableInMonth = function (data: FoodData, month: string): Ava
 	for (const category in data.availability) {
 		for (const item in data.availability[category]) {
 			const itemData = data.availability[category][item];
-			const isAvailable =
-				(itemData.freiland_months && itemData.freiland_months.includes(normalizedMonth)) ||
-				(itemData.lager_months && itemData.lager_months.includes(normalizedMonth));
+			const isFreiland = itemData.freiland_months?.includes(normalizedMonth) ?? false;
+			const isLager = itemData.lager_months?.includes(normalizedMonth) ?? false;
+			const isAvailable = isFreiland || isLager;
 
 			if (!isAvailable) {
 				continue;
 			}
 
+			if (onlyFreiland && !isFreiland) {
+				continue;
+			}
+
+			const availabilityType: AvailabilityType = isFreiland && isLager ? "both" : isFreiland ? "freiland" : "lager";
+			const itemWithType: AvailableFoodItem = {
+				name: item,
+				details: itemData,
+				availabilityType,
+			};
+
 			if (category === "vegetables") {
-				availableInMonth.vegetables.push({ name: item, details: itemData });
+				availableInMonth.vegetables.push(itemWithType);
 				continue;
 			}
 
 			if (category === "fruits") {
-				availableInMonth.fruits.push(item);
+				availableInMonth.fruits.push(itemWithType);
 				continue;
 			}
 
 			if (category === "herbs") {
-				availableInMonth.herbs.push(item);
+				availableInMonth.herbs.push(itemWithType);
 				continue;
 			}
 
 			if (category === "salads") {
-				availableInMonth.salads.push(item);
+				availableInMonth.salads.push(itemWithType);
 			}
 		}
 	}
