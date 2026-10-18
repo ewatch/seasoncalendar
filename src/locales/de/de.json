@@ -1,7 +1,6 @@
 {
-	"home_description": "Willkommen zum Saisonkalender fur Deutschland.",
+	"home_description": "Willkommen zum Saisonkalender für Deutschland.",
 	"about_description": "Hier findest du saisonale Lebensmittel nach Monat, damit du regionaler und bewusster einkaufen kannst.",
-	"home": "Home",
-	"about": "Über",
-	"blog": "Blog"
+	"home": "Start",
+	"about": "Über"
 }

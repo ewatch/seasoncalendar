@@ -2,7 +2,7 @@
 // You can import this data from anywhere in your site by using the `import` keyword.
 
 // Website metadata
-export const SITE_URL: string = "https://seasoncalendar.example.com";
+export const SITE_URL: string = "https://saisonkalender.netlify.app";
 export const SITE_TITLE: string = "Saisonkalender";
 export const SITE_DESCRIPTION: string = "Willkommen zum Saisonkalender für Deutschland!";
 
@@ -29,8 +29,6 @@ export const PAGES: Page[] = [
 
 // i18n
 export const DEFAULT_LOCALE = "de";
-export const BLOG_FALLBACK_LOCALE = "en";
 export const LOCALES = {
 	de: "de", // the `defaultLocale` value must present in `locales` keys
-	it: "it",
 };

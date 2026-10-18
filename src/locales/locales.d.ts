@@ -3,5 +3,4 @@ declare interface Locales {
 	about_description: string;
 	home: string;
 	about: string;
-	blog: string;
 }

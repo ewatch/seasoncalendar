@@ -1,5 +1,4 @@
 import { defineConfig } from "astro/config";
-import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import tailwind from "@astrojs/tailwind";
 import alpinejs from "@astrojs/alpinejs";
@@ -23,7 +22,6 @@ export default defineConfig({
 		},
 	},
 	integrations: [
-		mdx(),
 		sitemap({
 			i18n: {
 				locales,
@@ -40,7 +38,7 @@ export default defineConfig({
 		i18n({
 			locales,
 			defaultLocale,
-			exclude: ["pages/api/**/*", "pages/rss.xml.ts", "pages/[locale]/rss.xml.ts"],
+			exclude: ["pages/api/**/*"],
 		}),
 	],
 });

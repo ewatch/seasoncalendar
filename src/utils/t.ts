@@ -6,7 +6,6 @@ import { DEFAULT_LOCALE, LOCALES } from "@src/consts";
 import { getLocale } from "astro-i18n-aut";
 
 import de from "@src/locales/de/de.json";
-import it from "@locales/it.json";
 
 type TranslationMap = Record<string, string>;
 
@@ -26,7 +25,6 @@ const handler: ProxyHandler<TranslationMap> = {
 };
 
 const deProxy = new Proxy(de as TranslationMap, handler) as unknown as Locales;
-const itProxy = new Proxy(it as TranslationMap, handler) as unknown as Locales;
 
 export const defaultLocale = DEFAULT_LOCALE;
 export const locales = LOCALES;
@@ -36,29 +34,12 @@ export const locales = LOCALES;
  * @param astroUrl
  * @returns
  */
-export default function t(astroUrl: URL): Locales {
-	const locale = getLocale(astroUrl);
-
-	switch (locale) {
-		case "it":
-			return itProxy;
-		default:
-			return deProxy;
-	}
+export default function t(_astroUrl: URL): Locales {
+	return deProxy;
 }
 
-export function tFn(astroUrl: URL) {
-	const locale = getLocale(astroUrl);
-	let translations: Locales;
-
-	switch (locale) {
-		case "it":
-			translations = itProxy;
-			break;
-		default:
-			translations = deProxy;
-			break;
-	}
+export function tFn(_astroUrl: URL) {
+	const translations = deProxy;
 
 	return (key: string): string => {
 		if (key in translations) {

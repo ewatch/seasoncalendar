@@ -5,21 +5,21 @@ import { getLocaleUrlPrefix } from "astro-i18n-aut";
 const localeUrlPrefix = getLocaleUrlPrefix(Astro.url);
 ---
 
-<Layout title="404 | Astro starter">
+<Layout title="404 | Seite nicht gefunden">
 	<section class="flex h-full items-center p-16">
 		<div class="container mx-auto my-8 flex flex-col items-center justify-center px-5">
 			<div class="max-w-md text-center">
 				<h2 class="mb-8 text-9xl font-bold">
-					<span class="sr-only">Error</span>
+					<span class="sr-only">Fehler</span>
 					<span class="text-lima-700">404</span>
 				</h2>
-				<p class="text-3xl font-semibold md:text-3xl">Sorry, we couldn't find this page.</p>
-				<p class="mb-8 mt-4 text-lg text-stone-600 dark:text-slate-400">But dont worry, you can find plenty of other things on our homepage.</p>
+				<p class="text-3xl font-semibold md:text-3xl">Diese Seite gibt es leider nicht.</p>
+				<p class="mb-8 mt-4 text-lg text-stone-600 dark:text-slate-400">Auf der Startseite findest du, was gerade Saison hat.</p>
 				<a
 					rel="noopener noreferrer"
 					href={localeUrlPrefix || "/"}
 					class="inline-block rounded border border-lima-300 px-4 py-2 font-medium text-lima-800 transition-colors hover:bg-lima-100">
-					Back to homepage
+					Zur Startseite
 				</a>
 			</div>
 		</div>
