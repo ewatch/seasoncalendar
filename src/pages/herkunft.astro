@@ -1,0 +1,203 @@
+---
+import Layout from "@layouts/Layout.astro";
+import foodData from "@locales/de/food-calendar.json";
+import tradeJson from "@src/data/trade.json";
+import {
+	COUNTRY_COLORS,
+	HOME_COLOR,
+	countryName,
+	dativeCountry,
+	domesticShare,
+	formatTonnes,
+	renderImportSparkline,
+	renderSupplyBar,
+	type Partner,
+	type TradeData,
+	type TradeGroup,
+} from "@src/utils/trade";
+
+const trade = tradeJson as TradeData;
+const { year, productionYear } = trade.meta;
+const byImports = (a: TradeGroup, b: TradeGroup) => b.imports - a.imports;
+const sum = (groups: TradeGroup[]) => groups.reduce((total, group) => total + group.imports, 0);
+const topCountries = (groups: TradeGroup[], count: number): Partner[] => {
+	const totals = new Map<string, number>();
+	groups.forEach((group) => group.partners.forEach(([country, tonnes]) => totals.set(country, (totals.get(country) ?? 0) + tonnes)));
+	return [...totals.entries()].sort((a, b) => b[1] - a[1]).slice(0, count);
+};
+const percent = (part: number, total: number) => Math.round((part / total) * 100);
+
+// Months in which any food of the group has a German season (Freiland or Lager), for shading the import strip.
+const MONTHS = ["JAN", "FEB", "MRZ", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"];
+const calendarFoods = Object.assign({}, ...Object.values(foodData.availability)) as Record<string, { freiland_months: string[]; lager_months: string[] }>;
+const seasonMonths = (group: TradeGroup) =>
+	MONTHS.map((month) =>
+		group.foods.some((food) => calendarFoods[food]?.freiland_months.includes(month) || calendarFoods[food]?.lager_months.includes(month)),
+	);
+
+const sections = [
+	{ id: "gemuese", title: "Gemüse", groups: trade.groups.filter((group) => group.category === "vegetables").sort(byImports) },
+	{ id: "obst", title: "Obst & Nüsse", groups: trade.groups.filter((group) => group.category !== "vegetables").sort(byImports) },
+].map((section) => ({ ...section, total: sum(section.groups), countries: topCountries(section.groups, 3) }));
+
+const [vegetables, fruits] = sections;
+const topVegetable = vegetables.groups[0];
+const topFruit = fruits.groups[0];
+const allGroups = trade.groups;
+const [first, second] = topCountries(allGroups, 2);
+const firstTwoShare = percent(first[1] + second[1], sum(allGroups));
+---
+
+<Layout title="Woher kommt unser Obst und Gemüse? | Saisonkalender" description={`Importe von Obst und Gemüse nach Deutschland ${year}: Lieferländer, Mengen, Monate und Anteil der deutschen Ernte.`}>
+	<div id="origin-root" class="mx-auto max-w-5xl px-4 py-8 sm:px-6 md:py-12 lg:px-8">
+		<header class="mb-10 text-center">
+			<span class="mb-4 inline-block text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-500 md:text-xs">Herkunft</span>
+			<h1 class="mb-6 font-serif text-4xl leading-tight text-stone-900 sm:text-5xl md:text-6xl">
+				Woher kommt unser <span class="italic text-lima-800">Obst und Gemüse</span>?
+			</h1>
+			<p class="mx-auto max-w-2xl text-sm leading-relaxed text-stone-600 md:text-base">
+				Was nicht in Deutschland wächst oder gerade keine Saison hat, wird importiert. Hier siehst du, wie viel {year} eingeführt wurde, aus
+				welchen Ländern – und wie viel Deutschland selbst erntet.
+			</p>
+		</header>
+
+		<div class="mb-12 grid gap-px border border-stone-200 bg-stone-200 sm:grid-cols-3">
+			<div class="bg-paper p-5">
+				<div class="font-serif text-4xl text-stone-900">{Math.round((domesticShare(topVegetable) ?? 0) * 100)} %</div>
+				<p class="mt-2 text-sm leading-relaxed text-stone-600">
+					der {topVegetable.label} stammen aus deutscher Ernte. Sie sind mit {formatTonnes(topVegetable.imports)} das meistimportierte Gemüse.
+				</p>
+			</div>
+			<div class="bg-paper p-5">
+				<div class="font-serif text-4xl text-stone-900">{formatTonnes(topFruit.imports)}</div>
+				<p class="mt-2 text-sm leading-relaxed text-stone-600">{topFruit.label} wurden {year} eingeführt – mehr als jedes andere Obst.</p>
+			</div>
+			<div class="bg-paper p-5">
+				<div class="font-serif text-4xl text-stone-900">{firstTwoShare} %</div>
+				<p class="mt-2 text-sm leading-relaxed text-stone-600">
+					der hier erfassten Importe kommen aus {dativeCountry(first[0])} und {dativeCountry(second[0])}.
+				</p>
+			</div>
+		</div>
+
+		<nav aria-label="Abschnitte" class="mb-6 flex flex-wrap gap-2">
+			{
+				sections.map((section) => (
+					<a href={`#${section.id}`} class="border border-stone-300 px-3 py-2 text-[11px] uppercase tracking-[0.08em] text-stone-700 hover:border-stone-900">
+						{section.title}
+					</a>
+				))
+			}
+			<a href="#methode" class="border border-stone-300 px-3 py-2 text-[11px] uppercase tracking-[0.08em] text-stone-700 hover:border-stone-900">Daten & Methode</a>
+		</nav>
+
+		<p class="mb-10 flex flex-wrap gap-x-4 gap-y-1 text-xs text-stone-700" aria-label="Farben der Lieferländer">
+			<span class="inline-flex items-center gap-1.5">
+				<span aria-hidden="true" class="h-2.5 w-2.5 rounded-sm" style={`background:${HOME_COLOR}`} />
+				Deutschland (Ernte)
+			</span>
+			{
+				Object.entries(COUNTRY_COLORS).map(([country, color]) => (
+					<span class="inline-flex items-center gap-1.5">
+						<span aria-hidden="true" class="h-2.5 w-2.5 rounded-sm" style={`background:${color}`} />
+						{countryName(country)}
+					</span>
+				))
+			}
+			<span class="inline-flex items-center gap-1.5"><span aria-hidden="true" class="h-2.5 w-2.5 rounded-sm bg-stone-400"></span> andere Länder</span>
+		</p>
+
+		{
+			sections.map((section) => (
+				<section id={section.id} class="mb-16 scroll-mt-24">
+					<div class="mb-2 flex flex-wrap items-baseline justify-between gap-x-6 border-b border-stone-200 pb-2">
+						<h2 class="font-serif text-3xl text-stone-900">{section.title}</h2>
+						<span class="text-sm text-stone-600">
+							Importe {year}: {formatTonnes(section.total)}
+						</span>
+					</div>
+					<p class="mb-2 text-sm text-stone-600">
+						Wichtigste Lieferländer: {section.countries.map(([country, tonnes]) => `${countryName(country)} (${percent(tonnes, section.total)} %)`).join(", ")}.
+					</p>
+					<p class="mb-4 flex flex-wrap items-center gap-x-2 text-xs text-stone-600">
+						Balken: Angebot nach Herkunft. Rechts: Importmenge je Monat,
+						<span class="inline-flex items-center gap-1">
+							<span aria-hidden="true" class="inline-block h-2.5 w-2.5 bg-lima-100 ring-1 ring-lima-300"></span>
+							hinterlegt = heimische Saison
+						</span>
+					</p>
+					<ol class="divide-y divide-stone-200">
+						{section.groups.map((group, index) => (
+							<li class="grid gap-x-6 gap-y-3 py-4 md:grid-cols-[minmax(0,13rem)_minmax(0,1fr)_9rem]">
+								<div>
+									<div class="flex items-baseline gap-2">
+										<span aria-hidden="true" class="w-6 shrink-0 font-serif text-sm italic text-stone-500">
+											{index + 1}
+										</span>
+										{group.foods.length ? (
+											<a
+												href={`/?lebensmittel=${encodeURIComponent(group.foods[0])}`}
+												class="font-medium text-stone-900 underline decoration-stone-300 underline-offset-4 hover:text-lima-800">
+												{group.label}
+											</a>
+										) : (
+											<span class="font-medium text-stone-900">{group.label}</span>
+										)}
+									</div>
+									<div class="mt-1 flex flex-wrap items-center gap-2 pl-8 text-xs text-stone-600">
+										<span class="tabular-nums">{formatTonnes(group.imports)} Import</span>
+										{group.production ? <span class="tabular-nums">· {formatTonnes(group.production)} Ernte</span> : null}
+										{group.importOnly ? (
+											<span class="bg-stone-200 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-stone-700">nur Import</span>
+										) : group.production === null ? (
+											<span class="text-stone-500">· Ernte unbekannt</span>
+										) : null}
+									</div>
+								</div>
+								<div set:html={renderSupplyBar(group, 4)} />
+								<div set:html={renderImportSparkline(group, seasonMonths(group))} />
+							</li>
+						))}
+					</ol>
+				</section>
+			))
+		}
+
+		<section id="methode" class="mb-8 scroll-mt-24 border-t border-stone-200 pt-8 text-sm leading-relaxed text-stone-700">
+			<h2 class="mb-4 font-serif text-3xl text-stone-900">Daten & Methode</h2>
+			<ul class="list-disc space-y-2 pl-5">
+				<li>
+					Importmengen: <a class="underline decoration-stone-300 underline-offset-4 hover:text-lima-800" href="https://ec.europa.eu/eurostat/web/international-trade-in-goods/database">Eurostat Comext</a>,
+					Einfuhren nach Deutschland {year} (frisch, in Tonnen), nach Warennummern der Kombinierten Nomenklatur. Mehrere Lebensmittel teilen sich teils eine
+					Warennummer, z. B. alle Kopf- und Blattsalate.
+				</li>
+				<li>
+					Lieferland: Bei Ware aus anderen EU-Ländern nennt die Statistik das Versandland, nicht das Anbauland. Niederlande und Belgien sind deshalb oft
+					Umschlagplätze – Bananen etwa wachsen in Süd- und Mittelamerika und kommen über die Häfen Rotterdam und Antwerpen.
+				</li>
+				<li>
+					Anteil Deutschland: Erntemenge in Deutschland ({productionYear}, <a class="underline decoration-stone-300 underline-offset-4 hover:text-lima-800" href="https://ec.europa.eu/eurostat/databrowser/view/apro_cpsh1/default/table">Eurostat apro_cpsh1</a>)
+					geteilt durch das Angebot (Ernte + Importe). Exporte, Lagerbestände und Verarbeitung sind nicht berücksichtigt; wo Eurostat keine Erntemenge
+					veröffentlicht, zeigt der Balken nur die Importe.
+				</li>
+				<li>
+					Importe je Monat: Einfuhrmenge im jeweiligen Monat {year}. Hinterlegt sind die Monate, in denen der Saisonkalender heimische Freiland- oder
+					Lagerware führt. Eine monatliche deutsche Erntemenge veröffentlicht Eurostat nicht.
+				</li>
+				<li>Abgerufen am {trade.meta.fetched}. Die Daten werden bei der monatlichen Aktualisierung der Seite neu geladen.</li>
+			</ul>
+		</section>
+	</div>
+</Layout>
+
+<script>
+	import { bindTooltips } from "@src/utils/trade";
+
+	function initOriginPage() {
+		const root = document.getElementById("origin-root");
+		if (!root || root.dataset.initialized === "true") return;
+		root.dataset.initialized = "true";
+		bindTooltips(root);
+	}
+	document.addEventListener("astro:page-load", initOriginPage);
+</script>

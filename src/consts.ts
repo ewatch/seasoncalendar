@@ -22,6 +22,10 @@ export const PAGES: Page[] = [
 		href: "/",
 	},
 	{
+		title: "origin",
+		href: "/herkunft",
+	},
+	{
 		title: "about",
 		href: "/about",
 	},

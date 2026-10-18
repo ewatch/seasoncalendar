@@ -69,3 +69,11 @@ Zuerst 10 stark gesuchte Lebensmittel auswählen, deren CN8-Zuordnung fachlich p
 
 -   Champignons und Kresse stehen bei EatSmarter ganzjährig als „Freiland“, werden aber überwiegend in Hallen bzw. unter Glas erzeugt. Eine dritte Kategorie „geschützter Anbau“ würde das sauber abbilden.
 -   Nutzungsrechte: Die BLE-/BZfE-Poster untersagen eine Weiterverwendung ohne Zustimmung und wurden deshalb nur zur Plausibilisierung genutzt. Für die EatSmarter-Vorlage sollte die Nutzung ebenfalls geklärt oder mittelfristig eine eigene, quellenbelegte Zusammenstellung aufgebaut werden.
+
+## Importdaten (umgesetzt Oktober 2026)
+
+-   `npm run trade:fetch` (`scripts/fetch-trade.mjs`) lädt von Eurostat Comext (DS-045409) die Einfuhren nach Deutschland für das letzte vollständige Jahr – Jahressumme und alle zwölf Monate je Lieferland – sowie Exporte und die deutsche Erntemenge (apro_cpsh1). Ergebnis: `src/data/trade.json`. Der monatliche GitHub-Workflow aktualisiert die Datei automatisch.
+-   Die Zuordnung Lebensmittel → Warennummer (KN8/HS6) steht in `GROUPS` im Skript. Mehrere Kalendereinträge teilen sich teils eine Gruppe (z. B. alle Kopf- und Blattsalate); Kräuter, Rhabarber, Feldsalat u. a. haben keine eigene Warennummer.
+-   Selbstversorgungsgrad = Ernte / (Ernte + Import − Export). Werte stimmen gut mit BLE-Angaben überein (Tomaten 13 %, Äpfel 59 % vs. BLE 57 %).
+-   Einschränkung: Comext nennt bei EU-Lieferungen das Versandland. Bananen erscheinen deshalb überwiegend als „Niederlande/Belgien“. Destatis (GENESIS, Tabelle 51000-0018) weist das Ursprungsland aus, benötigt für die API aber ein (kostenloses) Konto.
+-   Die Karte (`public/trade-map.svg`) wird einmalig mit `npm run trade:map` aus Natural Earth (world-atlas, gemeinfrei) erzeugt und erst beim Öffnen der Detailansicht geladen.

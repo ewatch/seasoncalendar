@@ -4,7 +4,10 @@ import FormattedDate from "@components/FormattedDate.astro";
 import { statusBadge } from "@src/utils/foodList";
 
 const { sourceYear, lastReviewed } = foodData.metadata;
-const foodCount = Object.values(foodData.availability).reduce((sum, items) => sum + Object.keys(items).length, 0);
+// Import-only foods have no season months, so they are not counted here.
+const foodCount = Object.entries(foodData.availability)
+	.filter(([category]) => category !== "imports")
+	.reduce((sum, [, items]) => sum + Object.keys(items).length, 0);
 ---
 
 <article class="pb-20 text-stone-700">
@@ -57,6 +60,10 @@ const foodCount = Object.values(foodData.availability).reduce((sum, items) => su
 			</li>
 			<li>
 				Die Angaben sind Durchschnittswerte für Deutschland. Je nach Region und Wetter kann die Saison einige Wochen früher oder später beginnen.
+			</li>
+			<li>
+				Importmengen und Lieferländer stammen von Eurostat und sind auf der Seite
+				<a class="underline decoration-stone-300 underline-offset-4 hover:text-lima-800" href="/herkunft/">Herkunft</a> erklärt.
 			</li>
 			<li>Die Seite wird jeden Monat neu erstellt, damit automatisch der aktuelle Monat angezeigt wird.</li>
 		</ul>

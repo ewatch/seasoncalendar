@@ -1,5 +1,6 @@
 ---
 import foodData from "@locales/de/food-calendar.json";
+import tradeData from "@src/data/trade.json";
 import { foodDetails } from "@src/data/foodDetails";
 import { getAvailableInMonth, getCurrentMonth, getCurrentMonthDisplayName } from "@src/utils/foodFilter";
 import { renderFoodList, statusBadge } from "@src/utils/foodList";
@@ -14,6 +15,8 @@ const categories = [
 	{ key: "salads", number: "03", label: "Salate", items: food.salads, sectionClass: "", listClass: "lg:grid-cols-1" },
 	{ key: "herbs", number: "04", label: "Kräuter", items: food.herbs, sectionClass: "", listClass: "lg:grid-cols-1" },
 ];
+// Imported all year round, so this list does not depend on the month or the filter.
+const importFoods = Object.keys(foodData.availability.imports).map((name) => ({ name, availabilityType: "freiland" as const }));
 ---
 
 <div id="food-month-root" class="mx-auto min-h-screen max-w-5xl bg-paper px-4 py-8 sm:px-6 md:py-12 lg:px-8">
@@ -93,6 +96,7 @@ const categories = [
 				</a>
 			))
 		}
+		<a href="#cat-imports" class="jump-link">Immer importiert <span>{importFoods.length}</span></a>
 	</nav>
 
 	<div class="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-x-12 lg:grid-cols-4 lg:grid-rows-[auto_1fr] lg:gap-x-8">
@@ -110,6 +114,16 @@ const categories = [
 			))
 		}
 	</div>
+	<section id="cat-imports" class="mt-16 scroll-mt-24">
+		<div class="mb-2 flex items-baseline gap-3 border-b border-stone-200 pb-2">
+			<span aria-hidden="true" class="font-serif text-2xl italic text-stone-500">05</span>
+			<h2 class="font-serif text-xl text-stone-800">Immer importiert</h2>
+		</div>
+		<p class="mb-4 max-w-2xl text-sm leading-relaxed text-stone-600">
+			Wächst in Deutschland kaum oder gar nicht – egal in welchem Monat. Antippen zeigt, woher es kommt.
+		</p>
+		<ul class="grid grid-cols-2 gap-x-4 sm:grid-cols-3 lg:grid-cols-4" set:html={renderFoodList(importFoods, false)} />
+	</section>
 	<footer class="mt-20 border-t border-stone-100 pt-10 text-center">
 		<p class="mx-auto max-w-lg text-xs uppercase leading-relaxed tracking-widest text-stone-500">
 			Saison heißt hier: heimischer Freilandanbau oder Lagerware – nicht bloß Verfügbarkeit im Supermarkt.
@@ -134,41 +148,34 @@ const categories = [
 
 <script is:inline type="application/json" id="food-data" set:html={JSON.stringify(foodData)} />
 <script is:inline type="application/json" id="food-details-data" set:html={JSON.stringify(foodDetails)} />
+<script is:inline type="application/json" id="trade-data" set:html={JSON.stringify(tradeData)} />
 
 <script>
 	import { getAvailableInMonth, getCurrentMonth, getMonthDisplayName, getNextMonth, getPreviousMonth } from "@src/utils/foodFilter";
 	import { escapeHtml, renderFoodList } from "@src/utils/foodList";
+	import {
+		bindTooltips,
+		dativeCountry,
+		formatTonnes,
+		groupForFood,
+		renderMonthStrip,
+		renderSupplyBar,
+		renderSupplySummary,
+		renderTradeMap,
+		mountTradeMap,
+		type TradeData,
+	} from "@src/utils/trade";
 	const monthOrder = ["JAN", "FEB", "MRZ", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"];
 	const monthShort = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
-	const categoryLabels: Record<string, string> = { vegetables: "Gemüse", fruits: "Obst", salads: "Salat", herbs: "Kraut", nuts: "Nuss" };
+	const categoryLabels: Record<string, string> = { vegetables: "Gemüse", fruits: "Obst", salads: "Salat", herbs: "Kraut", nuts: "Nuss", imports: "Importware" };
 	const dotLabels = { freiland: "Freiland", lager: "Lager", both: "Freiland + Lager" };
-	const supplyLocations: Record<string, Array<{ label: string; x: number; y: number }>> = {
-		Deutschland: [{ label: "Deutschland", x: 343, y: 65 }],
-		"Italien & Polen": [
-			{ label: "Italien", x: 337, y: 82 },
-			{ label: "Polen", x: 351, y: 66 },
-		],
-		"Neuseeland & Chile": [
-			{ label: "Neuseeland", x: 610, y: 238 },
-			{ label: "Chile", x: 196, y: 231 },
-		],
-		Niederlande: [{ label: "Niederlande", x: 330, y: 61 }],
-		"Spanien & Marokko": [
-			{ label: "Spanien", x: 316, y: 84 },
-			{ label: "Marokko", x: 315, y: 101 },
-		],
-		Spanien: [{ label: "Spanien", x: 316, y: 84 }],
-		"Niederlande & Belgien": [
-			{ label: "Niederlande", x: 330, y: 61 },
-			{ label: "Belgien", x: 329, y: 67 },
-		],
-	};
 	function initSeasonCalendar() {
 		const root = document.getElementById("food-month-root") as HTMLElement | null;
 		if (!root || root.dataset.initialized === "true") return;
 		root.dataset.initialized = "true";
 		const seasonData = JSON.parse(document.getElementById("food-data")?.textContent || "{}");
 		const detailData = JSON.parse(document.getElementById("food-details-data")?.textContent || "{}");
+		const tradeData: TradeData = JSON.parse(document.getElementById("trade-data")?.textContent || "{}");
 		const dialog = document.getElementById("food-detail") as HTMLDialogElement;
 		const detailContent = document.getElementById("detail-content");
 		const search = document.getElementById("food-search") as HTMLInputElement;
@@ -202,14 +209,10 @@ const categories = [
 					return `<div class="text-center"><span class="mb-2 block h-9 ${style}" title="${typeLabel}"></span><span class="text-[9px] uppercase tracking-wide text-stone-600">${monthShort[index]}<span class="sr-only">: ${typeLabel}</span></span></div>`;
 				})
 				.join("");
-			const origins =
-				enriched?.origins
-					?.map(
-						(origin: any) =>
-							`<li class="grid grid-cols-[1fr_auto] gap-x-4 border-t border-stone-200 py-3"><strong class="font-medium text-stone-800">${escapeHtml(origin.country)}</strong><span class="text-xs text-stone-500">${escapeHtml(origin.months)}</span><span class="col-span-2 mt-1 text-xs text-stone-500">${escapeHtml(origin.route)}</span></li>`,
-					)
-					.join("") || "";
-			const supplyMap = enriched ? renderSupplyMap(name, enriched.origins) : "";
+			const tradeSection = renderTradeSection(name);
+			const isImport = item.category === "imports";
+			// Import-only foods have no season; the intro sentence already says so.
+			const seasonSection = isImport ? "" : `<section class="mb-9"><h3 class="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-stone-800">Heimische Saison</h3><div class="grid grid-cols-12 gap-1">${timeline}</div><div aria-hidden="true" class="mt-3 flex gap-4 text-[10px] uppercase tracking-wider text-stone-600"><span class="inline-flex items-center gap-1"><span class="h-2.5 w-2.5 bg-lima-500"></span>Freiland</span><span class="inline-flex items-center gap-1"><span class="h-2.5 w-2.5 bg-stone-300"></span>Lager</span><span class="inline-flex items-center gap-1"><span class="h-2.5 w-2.5 bg-amber-300"></span>Beides</span></div></section>`;
 			const sources =
 				enriched?.sources
 					?.map(
@@ -217,28 +220,30 @@ const categories = [
 							`<a class="underline decoration-stone-300 underline-offset-4 hover:text-lima-800" href="${source.url}" target="_blank" rel="noreferrer">${escapeHtml(source.label)}</a>`,
 					)
 					.join(" · ") ||
-				`<a class="underline decoration-stone-300 underline-offset-4 hover:text-lima-800" href="${item.details.link}" target="_blank" rel="noreferrer">BZfE Lebensmittelkunde</a>`;
-			detailContent.innerHTML = `<div class="mb-2 text-xs uppercase tracking-widest text-stone-500">${categoryLabels[item.category] || item.category}</div><h2 class="mb-4 font-serif text-5xl italic text-stone-900">${escapeHtml(name)}</h2><p class="mb-8 text-base leading-relaxed text-stone-600">${escapeHtml(enriched?.summary || `Für ${name} sind ${seasonalMonths.length} Monate mit heimischer Freiland- oder Lagerware im Kalender erfasst.`)}</p><section class="mb-9"><h3 class="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-stone-800">Heimische Saison</h3><div class="grid grid-cols-12 gap-1">${timeline}</div><div aria-hidden="true" class="mt-3 flex gap-4 text-[10px] uppercase tracking-wider text-stone-600"><span class="inline-flex items-center gap-1"><span class="h-2.5 w-2.5 bg-lima-500"></span>Freiland</span><span class="inline-flex items-center gap-1"><span class="h-2.5 w-2.5 bg-stone-300"></span>Lager</span><span class="inline-flex items-center gap-1"><span class="h-2.5 w-2.5 bg-amber-300"></span>Beides</span></div></section>${enriched ? `<section class="mb-8 border-l-2 border-lima-500 bg-lima-50 p-5"><h3 class="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-lima-900">Einkaufstipp</h3><p class="text-sm leading-relaxed text-stone-700">${escapeHtml(enriched.tip)}</p></section><section class="mb-8"><div class="mb-2 flex items-baseline justify-between gap-4"><h3 class="text-xs font-semibold uppercase tracking-[0.16em] text-stone-800">Typische Wege nach Deutschland</h3><span class="shrink-0 border border-amber-300 bg-amber-50 px-2 py-1 text-[9px] uppercase tracking-wider text-amber-900">POC · indikativ</span></div><p class="mb-3 text-xs leading-relaxed text-stone-500">${escapeHtml(enriched.supplyNote)}</p>${supplyMap}<ul>${origins}</ul></section><section class="mb-8"><h3 class="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-stone-800">Aufbewahrung</h3><p class="text-sm leading-relaxed text-stone-600">${escapeHtml(enriched.storage)}</p></section>` : `<section class="mb-8 border border-dashed border-stone-300 p-5"><p class="text-sm leading-relaxed text-stone-500">Für dieses Lebensmittel zeigt der Prototyp bereits die Saison. Lieferwege und Lagerhinweise würden nach demselben Datenmodell ergänzt.</p></section>`}<p class="border-t border-stone-200 pt-4 text-[10px] leading-relaxed text-stone-500"><strong class="uppercase tracking-wider">Quellen:</strong> ${sources}. Importkorridore sind redaktionelle Orientierung; Herkunft am Produkt prüfen.</p>`;
+				`<a class="underline decoration-stone-300 underline-offset-4 hover:text-lima-800" href="${item.details.link}" target="_blank" rel="noreferrer">BZfE</a>`;
+			detailContent.innerHTML = `<div class="mb-2 text-xs uppercase tracking-widest text-stone-500">${categoryLabels[item.category] || item.category}</div><h2 class="mb-4 font-serif text-5xl italic text-stone-900">${escapeHtml(name)}</h2><p class="mb-8 text-base leading-relaxed text-stone-600">${escapeHtml(enriched?.summary || (isImport ? `${name} wächst in Deutschland kaum oder gar nicht und wird das ganze Jahr importiert.` : `Für ${name} sind ${seasonalMonths.length} Monate mit heimischer Freiland- oder Lagerware im Kalender erfasst.`))}</p>${seasonSection}${enriched ? `<section class="mb-8 border-l-2 border-lima-500 bg-lima-50 p-5"><h3 class="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-lima-900">Einkaufstipp</h3><p class="text-sm leading-relaxed text-stone-700">${escapeHtml(enriched.tip)}</p></section>` : ""}${tradeSection}${enriched ? `<section class="mb-8"><h3 class="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-stone-800">Aufbewahrung</h3><p class="text-sm leading-relaxed text-stone-600">${escapeHtml(enriched.storage)}</p></section>` : ""}<p class="border-t border-stone-200 pt-4 text-[10px] leading-relaxed text-stone-500"><strong class="uppercase tracking-wider">Quellen:</strong> ${sources} · Eurostat (Handel ${tradeData.meta.year}, Ernte ${tradeData.meta.productionYear}). Herkunft am Produkt prüfen.</p>`;
 			dialog.showModal();
+			const mapFigure = detailContent.querySelector<HTMLElement>("[data-trade-map]");
+			const group = groupForFood(tradeData, name);
+			if (mapFigure && group) mountTradeMap(mapFigure, group);
 		}
 
-		function renderSupplyMap(foodName: string, origins: Array<{ country: string }>) {
-			const germany = supplyLocations.Deutschland[0];
-			const points = origins.flatMap((origin) => supplyLocations[origin.country] || []);
-			const routes = points
-				.filter((point) => point.label !== "Deutschland")
-				.map((point, index) => {
-					const bend = Math.max(18, Math.abs(germany.x - point.x) * 0.18);
-					const middleX = (point.x + germany.x) / 2;
-					const middleY = Math.min(point.y, germany.y) - bend;
-					return `<path class="supply-route" style="animation-delay:${index * 120}ms" d="M ${point.x} ${point.y} Q ${middleX} ${middleY} ${germany.x} ${germany.y}"/><circle class="supply-origin" cx="${point.x}" cy="${point.y}" r="4"><title>${escapeHtml(point.label)} → Deutschland</title></circle>`;
-				})
-				.join("");
-			const labels = points
-				.filter((point, index, list) => list.findIndex((entry) => entry.label === point.label) === index)
-				.map((point) => `<text class="supply-label" x="${point.x + 7}" y="${point.y - 7}">${escapeHtml(point.label)}</text>`)
-				.join("");
-			return `<figure class="supply-map mb-5"><svg viewBox="0 0 640 280" role="img" aria-label="Schematische Weltkarte: typische Herkunftswege für ${escapeHtml(foodName)} nach Deutschland"><defs><pattern id="map-grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" stroke-width=".5"/></pattern></defs><rect width="640" height="280" fill="url(#map-grid)" class="map-grid"/><g class="map-land"><path d="M28 59 63 32l67 7 28 24 34 8 23 35-26 25-38-3-19 29-24 7-18-35-33-9-31-31z"/><path d="m157 167 27 11 22 34-2 42-17 18-15-39-25-30z"/><path d="m286 57 32-24 55 4 18 22 55-1 63 18 39 29-21 27-51-7-35 23-30-22-42 4-13-27-36-8-20-21z"/><path d="m320 133 45 7 24 35-14 60-27 30-30-41-10-53z"/><path d="m524 198 41-17 39 21-5 31-40 10-30-20z"/><path d="m600 246 19 6-9 10z"/></g>${routes}<circle class="supply-destination" cx="${germany.x}" cy="${germany.y}" r="6"><title>Deutschland</title></circle>${labels}<text class="supply-label supply-label--destination" x="${germany.x + 9}" y="${germany.y + 14}">Deutschland</text></svg><figcaption>Schematische Herkunftskorridore · keine exakten Routen oder Live-Transporte</figcaption></figure>`;
+		function renderTradeSection(name: string) {
+			const group = groupForFood(tradeData, name);
+			if (!group) {
+				return `<section class="mb-8 border border-dashed border-stone-300 p-5"><p class="text-sm leading-relaxed text-stone-600">Für ${escapeHtml(name)} gibt es keine eigene Warennummer in der Handelsstatistik, daher zeigen wir hier keine Importdaten.</p></section>`;
+			}
+			const monthIndex = monthOrder.indexOf(currentMonth);
+			const month = group.monthly[monthIndex];
+			const topMonth = month.partners
+				.slice(0, 2)
+				.map(([country, tonnes]) => `${dativeCountry(country)} (${Math.round((tonnes / month.total) * 100)} %)`)
+				.join(" und ");
+			const monthText = month.total
+				? `Im ${getMonthDisplayName(currentMonth)} ${tradeData.meta.year}: ${formatTonnes(month.total)}, vor allem aus ${topMonth}.`
+				: `Im ${getMonthDisplayName(currentMonth)} gab es kaum Importe.`;
+			const heading = "mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-stone-700";
+			return `<section class="mb-9"><h3 class="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-stone-800">Woher kommt das?</h3>${group.foods.length > 1 ? `<p class="mb-3 text-xs leading-relaxed text-stone-600">Die Handelsstatistik fasst zusammen: <strong class="font-semibold">${escapeHtml(group.label)}</strong>.</p>` : ""}<h4 class="${heading}">Angebot ${tradeData.meta.year} nach Herkunft: ${formatTonnes(group.imports + (group.production ?? 0))}</h4>${renderSupplyBar(group)}<div class="mt-3">${renderSupplySummary(group, tradeData.meta.year)}</div><h4 class="${heading} mt-6">Importe je Monat</h4><p class="mb-3 text-xs leading-relaxed text-stone-600">${escapeHtml(monthText)}</p>${renderMonthStrip(group, monthIndex)}<div class="mt-6">${renderTradeMap(group)}</div><p class="text-[11px] leading-relaxed text-stone-600">Lieferland laut Handelsstatistik: bei EU-Ländern das Versandland. Niederlande und Belgien sind oft Umschlagplätze für Ware aus Übersee. <a class="underline decoration-stone-300 underline-offset-4 hover:text-lima-800" href="/herkunft/">Alle Lebensmittel im Vergleich</a></p></section>`;
 		}
 
 		function bindFoodButtons() {
@@ -323,6 +328,10 @@ const categories = [
 			if (event.target === dialog) dialog.close();
 		});
 		bindFoodButtons();
+		bindTooltips(dialog);
+		// Deep link from the origin page, e.g. /?lebensmittel=Tomate
+		const linkedFood = new URLSearchParams(window.location.search).get("lebensmittel");
+		if (linkedFood) openDetail(linkedFood);
 	}
 	document.addEventListener("DOMContentLoaded", initSeasonCalendar);
 	document.addEventListener("astro:page-load", initSeasonCalendar);
@@ -368,80 +377,13 @@ const categories = [
 	dialog[open] {
 		animation: detail-in 0.28s ease-out;
 	}
-	:global(.supply-map) {
-		border: 1px solid #e7e5e4;
-		background: #f8f7f1;
-	}
-	:global(.supply-map svg) {
-		display: block;
-		width: 100%;
-		height: auto;
-		overflow: visible;
-	}
-	:global(.supply-map figcaption) {
-		border-top: 1px solid #e7e5e4;
-		padding: 0.5rem 0.75rem;
-		font-size: 9px;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: #a8a29e;
-	}
-	:global(.map-grid) {
-		color: #e7e5e4;
-	}
-	:global(.map-land) {
-		fill: #deddd5;
-		stroke: #c9c7bb;
-		stroke-width: 1;
-	}
-	:global(.supply-route) {
-		fill: none;
-		stroke: #387f0c;
-		stroke-width: 1.8;
-		stroke-dasharray: 5 4;
-		stroke-linecap: round;
-		opacity: 0.72;
-		animation: route-in 0.8s ease-out both;
-	}
-	:global(.supply-origin) {
-		fill: #fdfcf8;
-		stroke: #387f0c;
-		stroke-width: 2.5;
-	}
-	:global(.supply-destination) {
-		fill: #82eb30;
-		stroke: #1c1917;
-		stroke-width: 2;
-	}
-	:global(.supply-label) {
-		font-family: Georgia, serif;
-		font-size: 10px;
-		font-style: italic;
-		fill: #57534e;
-		paint-order: stroke;
-		stroke: #f8f7f1;
-		stroke-width: 3px;
-		stroke-linejoin: round;
-	}
-	:global(.supply-label--destination) {
-		font-style: normal;
-		font-weight: 700;
-		fill: #1c1917;
-	}
 	@keyframes detail-in {
 		from {
 			opacity: 0;
 			transform: translateX(2rem);
 		}
 	}
-	@keyframes route-in {
-		from {
-			stroke-dashoffset: 80;
-			opacity: 0;
-		}
-	}
 	@media (prefers-reduced-motion: reduce) {
-		.supply-route,
 		dialog[open] {
 			animation: none;
 		}

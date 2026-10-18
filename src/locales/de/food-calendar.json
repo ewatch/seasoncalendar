@@ -634,12 +634,110 @@
               "icon": "🥬",
               "link": "https://www.bzfe.de/kueche-und-alltag/kochen/how-to-obst-und-gemuese/how-to-salate"
           },
-          "Rucola": {
-            "freiland_months": ["MRZ", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV"],
-            "lager_months": [],
-            "icon": "",
-            "link": "https://www.bzfe.de/kueche-und-alltag/kochen/how-to-obst-und-gemuese/how-to-salate"
-          }
+        "Rucola": {
+          "freiland_months": ["MRZ", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV"],
+          "lager_months": [],
+          "icon": "",
+          "link": "https://www.bzfe.de/kueche-und-alltag/kochen/how-to-obst-und-gemuese/how-to-salate"
+        }
+      },
+      "imports": {
+        "Banane": {
+          "freiland_months": [],
+          "lager_months": [],
+          "icon": "",
+          "link": "https://www.bzfe.de/suche?tx_solr%5Bq%5D=Banane"
+        },
+        "Orange": {
+          "freiland_months": [],
+          "lager_months": [],
+          "icon": "",
+          "link": "https://www.bzfe.de/suche?tx_solr%5Bq%5D=Orange"
+        },
+        "Mandarine/Clementine": {
+          "freiland_months": [],
+          "lager_months": [],
+          "icon": "",
+          "link": "https://www.bzfe.de/suche?tx_solr%5Bq%5D=Mandarine"
+        },
+        "Zitrone/Limette": {
+          "freiland_months": [],
+          "lager_months": [],
+          "icon": "",
+          "link": "https://www.bzfe.de/suche?tx_solr%5Bq%5D=Zitrone"
+        },
+        "Grapefruit": {
+          "freiland_months": [],
+          "lager_months": [],
+          "icon": "",
+          "link": "https://www.bzfe.de/suche?tx_solr%5Bq%5D=Grapefruit"
+        },
+        "Wassermelone": {
+          "freiland_months": [],
+          "lager_months": [],
+          "icon": "",
+          "link": "https://www.bzfe.de/suche?tx_solr%5Bq%5D=Wassermelone"
+        },
+        "Honigmelone": {
+          "freiland_months": [],
+          "lager_months": [],
+          "icon": "",
+          "link": "https://www.bzfe.de/suche?tx_solr%5Bq%5D=Melone"
+        },
+        "Avocado": {
+          "freiland_months": [],
+          "lager_months": [],
+          "icon": "",
+          "link": "https://www.bzfe.de/kueche-und-alltag/kochen/how-to-obst-und-gemuese/how-to-avocado"
+        },
+        "Ananas": {
+          "freiland_months": [],
+          "lager_months": [],
+          "icon": "",
+          "link": "https://www.bzfe.de/suche?tx_solr%5Bq%5D=Ananas"
+        },
+        "Kiwi": {
+          "freiland_months": [],
+          "lager_months": [],
+          "icon": "",
+          "link": "https://www.bzfe.de/suche?tx_solr%5Bq%5D=Kiwi"
+        },
+        "Mango": {
+          "freiland_months": [],
+          "lager_months": [],
+          "icon": "",
+          "link": "https://www.bzfe.de/kueche-und-alltag/kochen/how-to-obst-und-gemuese/how-to-mango"
+        },
+        "Papaya": {
+          "freiland_months": [],
+          "lager_months": [],
+          "icon": "",
+          "link": "https://www.bzfe.de/suche?tx_solr%5Bq%5D=Papaya"
+        },
+        "Feige": {
+          "freiland_months": [],
+          "lager_months": [],
+          "icon": "",
+          "link": "https://www.bzfe.de/suche?tx_solr%5Bq%5D=Feige"
+        },
+        "Dattel": {
+          "freiland_months": [],
+          "lager_months": [],
+          "icon": "",
+          "link": "https://www.bzfe.de/suche?tx_solr%5Bq%5D=Datteln"
+        },
+        "Knoblauch": {
+          "freiland_months": [],
+          "lager_months": [],
+          "icon": "",
+          "link": "https://www.bzfe.de/suche?tx_solr%5Bq%5D=Knoblauch"
+        },
+        "Ingwer": {
+          "freiland_months": [],
+          "lager_months": [],
+          "icon": "",
+          "link": "https://www.bzfe.de/suche?tx_solr%5Bq%5D=Ingwer"
+        }
       }
     }
   }

@@ -9,7 +9,9 @@
 		"preview": "astro preview",
 		"astro": "astro",
 		"pwa:generate-assets": "pwa-assets-generator --preset minimal public/logo.svg",
-		"test": "node --import tsx --test \"tests/**/*.test.ts\""
+		"test": "node --import tsx --test \"tests/**/*.test.ts\"",
+		"trade:fetch": "node scripts/fetch-trade.mjs",
+		"trade:map": "node scripts/build-trade-map.mjs"
 	},
 	"dependencies": {
 		"@astrojs/alpinejs": "^1.0.0",
@@ -28,12 +30,15 @@
 		"astro-icon": "^1.2.0",
 		"astro-seo": "^1.2.0",
 		"autoprefixer": "^10.6.1",
+		"d3-geo": "^3.1.1",
 		"postcss": "^8.5.30",
 		"prettier": "^3.9.10",
 		"prettier-plugin-astro": "^0.14.0",
 		"prettier-plugin-tailwindcss": "^0.6.14",
 		"sharp": "^0.35.5",
-		"tsx": "^4.23.15"
+		"topojson-client": "^3.1.0",
+		"tsx": "^4.23.15",
+		"world-atlas": "^2.0.2"
 	},
 	"prettier": {
 		"tabWidth": 4,

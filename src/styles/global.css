@@ -18,3 +18,175 @@ html {
 body {
 	@apply m-0 bg-stone-50 p-0 text-stone-800 transition-all duration-300;
 }
+
+/* Import charts (rendered as HTML strings, so they cannot use component-scoped styles) */
+.trade-bar {
+	display: flex;
+	gap: 2px;
+	height: 14px;
+}
+.trade-seg {
+	min-width: 3px;
+}
+.trade-bar > :first-child {
+	border-radius: 4px 0 0 4px;
+}
+.trade-bar > :last-child {
+	border-radius: 0 4px 4px 0;
+}
+.trade-bar > :only-child {
+	border-radius: 4px;
+}
+.trade-seg--rest {
+	background: #d6d3d1;
+}
+.trade-strip {
+	display: grid;
+	grid-template-columns: repeat(12, minmax(0, 1fr));
+	gap: 4px;
+}
+.trade-col-track {
+	display: flex;
+	height: 88px;
+	align-items: flex-end;
+	border-bottom: 1px solid #d6d3d1;
+}
+.trade-col-stack {
+	display: flex;
+	width: 100%;
+	flex-direction: column;
+	gap: 2px;
+	overflow: hidden;
+	border-radius: 4px 4px 0 0;
+}
+.trade-col-seg {
+	min-height: 1px;
+}
+.trade-col-label {
+	display: block;
+	margin-top: 4px;
+	text-align: center;
+	font-size: 9px;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: #57534e;
+}
+.trade-col.is-current .trade-col-label {
+	font-weight: 700;
+	color: #1c1917;
+}
+.trade-col.is-current .trade-col-track {
+	background: #f5f5f4;
+}
+[data-tip]:focus-visible {
+	outline: 2px solid #1c1917;
+	outline-offset: 2px;
+}
+.trade-tooltip {
+	position: fixed;
+	z-index: 60;
+	display: none;
+	max-width: 260px;
+	padding: 6px 8px;
+	background: #1c1917;
+	color: #fdfcf8;
+	font-size: 12px;
+	line-height: 1.4;
+	pointer-events: none;
+}
+.trade-map {
+	border: 1px solid #e7e5e4;
+	background: #f8f7f1;
+}
+.trade-map-canvas {
+	aspect-ratio: 16 / 9;
+}
+.trade-map svg {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+.trade-map figcaption {
+	border-top: 1px solid #e7e5e4;
+	padding: 0.5rem 0.75rem;
+	font-size: 10px;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: #57534e;
+}
+.trade-land {
+	fill: #deddd5;
+	stroke: #f8f7f1;
+	stroke-width: 0.6;
+	vector-effect: non-scaling-stroke;
+}
+.trade-land.is-home {
+	fill: #44403c;
+}
+.trade-route {
+	fill: none;
+	stroke-linecap: round;
+	opacity: 0.85;
+	vector-effect: non-scaling-stroke;
+	stroke-dasharray: 6 4;
+	animation: trade-route-in 0.8s ease-out both;
+}
+.trade-origin {
+	fill: #fdfcf8;
+	stroke-width: 2.5;
+	vector-effect: non-scaling-stroke;
+}
+.trade-home {
+	fill: #82eb30;
+	stroke: #1c1917;
+	stroke-width: 2;
+	vector-effect: non-scaling-stroke;
+}
+.trade-label {
+	font-family: Georgia, serif;
+	font-style: italic;
+	fill: #1c1917;
+	paint-order: stroke;
+	stroke: #f8f7f1;
+	stroke-width: 3px;
+	stroke-linejoin: round;
+}
+@keyframes trade-route-in {
+	from {
+		stroke-dashoffset: 60;
+		opacity: 0;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.trade-route {
+		animation: none;
+	}
+}
+.trade-spark {
+	display: grid;
+	height: 40px;
+	grid-template-columns: repeat(12, minmax(0, 1fr));
+	gap: 2px;
+	border-bottom: 1px solid #a8a29e;
+}
+.trade-spark-col {
+	display: flex;
+	align-items: flex-end;
+}
+.trade-spark-col.is-season {
+	background: #e3fdca;
+}
+.trade-spark-bar {
+	width: 100%;
+	border-radius: 2px 2px 0 0;
+	background: #57534e;
+}
+.trade-spark-axis {
+	display: flex;
+	justify-content: space-between;
+	margin-top: 2px;
+	font-size: 9px;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: #57534e;
+}
