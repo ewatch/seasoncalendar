@@ -8,8 +8,7 @@
 import "@styles/global.css";
 import "@fontsource-variable/inter";
 import { SEO } from "astro-seo";
-import { SITE_TITLE, SITE_DESCRIPTION, TWITTER_CREATOR } from "@src/consts";
-import { getLocale } from "astro-i18n-aut";
+import { SITE_TITLE, SITE_DESCRIPTION, TWITTER_CREATOR, DEFAULT_LOCALE } from "@src/consts";
 
 interface Props {
 	title: string;
@@ -17,7 +16,6 @@ interface Props {
 	image?: string;
 }
 
-const locale = getLocale(Astro.url);
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const { title = SITE_TITLE, description = SITE_DESCRIPTION, image = "/og-image.png" } = Astro.props as Props;
 const resolvedImageWithDomain = new URL(image, Astro.site).toString();
@@ -40,7 +38,7 @@ const resolvedImageWithDomain = new URL(image, Astro.site).toString();
 		optional: {
 			description: description,
 			siteName: title,
-			locale: locale,
+			locale: DEFAULT_LOCALE,
 		},
 		image: {
 			alt: title,

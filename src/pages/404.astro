@@ -1,8 +1,5 @@
 ---
 import Layout from "@layouts/Layout.astro";
-import { getLocaleUrlPrefix } from "astro-i18n-aut";
-
-const localeUrlPrefix = getLocaleUrlPrefix(Astro.url);
 ---
 
 <Layout title="404 | Seite nicht gefunden">
@@ -17,7 +14,7 @@ const localeUrlPrefix = getLocaleUrlPrefix(Astro.url);
 				<p class="mb-8 mt-4 text-lg text-stone-600 dark:text-slate-400">Auf der Startseite findest du, was gerade Saison hat.</p>
 				<a
 					rel="noopener noreferrer"
-					href={localeUrlPrefix || "/"}
+					href="/"
 					class="inline-block rounded border border-lima-300 px-4 py-2 font-medium text-lima-800 transition-colors hover:bg-lima-100">
 					Zur Startseite
 				</a>

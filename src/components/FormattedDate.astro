@@ -1,7 +1,5 @@
 ---
-import { getLocale } from "astro-i18n-aut";
-
-const locale = getLocale(Astro.url);
+import { DEFAULT_LOCALE } from "@src/consts";
 
 interface Props {
 	date: Date;
@@ -13,7 +11,7 @@ const { date, includeTime } = Astro.props;
 
 <time datetime={date.toISOString()}>
 	{
-		date.toLocaleDateString(locale, {
+		date.toLocaleDateString(DEFAULT_LOCALE, {
 			year: "numeric",
 			month: "short",
 			day: "numeric",

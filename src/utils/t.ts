@@ -3,7 +3,6 @@
  */
 
 import { DEFAULT_LOCALE, LOCALES } from "@src/consts";
-import { getLocale } from "astro-i18n-aut";
 
 import de from "@src/locales/de/de.json";
 
@@ -56,15 +55,8 @@ export function tFn(_astroUrl: URL) {
  * @param astroUrl
  * @returns
  */
-export function localizePath(link: string | URL, astroUrl: string | URL): string {
-	const locale = getLocale(astroUrl);
-	let localizedLink = "";
-	if (locale && locale !== defaultLocale) {
-		const localeLink = `/${getLocale(astroUrl) ?? ""}/${link}`.replaceAll("//", "/") ?? "";
-		localizedLink = localeLink;
-	} else {
-		localizedLink = String(link);
-	}
+export function localizePath(link: string | URL, _astroUrl: string | URL): string {
+	let localizedLink = String(link);
 
 	// localizedLink add last slash
 	if (!localizedLink.endsWith("/")) {
