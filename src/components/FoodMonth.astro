@@ -1,353 +1,449 @@
 ---
 import foodData from "@locales/de/food-calendar.json";
+import { foodDetails } from "@src/data/foodDetails";
 import { getAvailableInMonth, getCurrentMonth, getCurrentMonthDisplayName } from "@src/utils/foodFilter";
-
-const SHOW_SEASON_FILTER = true;
+import { renderFoodList, statusBadge } from "@src/utils/foodList";
 
 const currentMonth = getCurrentMonth();
 const currentMonthDisplayName = getCurrentMonthDisplayName();
 const food = getAvailableInMonth(foodData, currentMonth);
-
-const statusLabel = {
-	freiland: "Freiland",
-	lager: "Lager",
-	both: "Freiland + Lager",
-} as const;
-
-function getStatusDotClass(type: keyof typeof statusLabel): string {
-	if (type === "freiland") {
-		return "bg-lima-400";
-	}
-
-	if (type === "both") {
-		return "bg-amber-300";
-	}
-
-	return "bg-stone-300";
-}
+// Gemüse is by far the longest list, so it gets two grid columns; Salate and Kräuter share the last column.
+const categories = [
+	{ key: "vegetables", number: "01", label: "Gemüse", items: food.vegetables, sectionClass: "md:col-span-2 lg:row-span-2", listClass: "md:grid-cols-3 lg:grid-cols-2" },
+	{ key: "fruits", number: "02", label: "Obst & Nüsse", items: [...food.fruits, ...food.nuts], sectionClass: "lg:row-span-2", listClass: "lg:grid-cols-1" },
+	{ key: "salads", number: "03", label: "Salate", items: food.salads, sectionClass: "", listClass: "lg:grid-cols-1" },
+	{ key: "herbs", number: "04", label: "Kräuter", items: food.herbs, sectionClass: "", listClass: "lg:grid-cols-1" },
+];
 ---
 
-<div id="food-month-root" class="max-w-5xl mx-auto px-4 py-8 md:py-12 sm:px-6 lg:px-8 bg-paper min-h-screen">
-    <header class="mb-12 md:mb-16 text-center">
-        <span class="inline-block text-stone-500 uppercase tracking-[0.2em] text-[10px] md:text-xs font-semibold mb-4">
-            Der Saisonale Kalender
-        </span>
-        <h1 class="text-4xl sm:text-5xl md:text-7xl font-serif text-stone-900 mb-6 md:mb-8 leading-tight">
-            Was wächst im <span id="month-title-main" class="italic text-lima-800">{currentMonthDisplayName}</span>?
-        </h1>
+<div id="food-month-root" class="mx-auto min-h-screen max-w-5xl bg-paper px-4 py-8 sm:px-6 md:py-12 lg:px-8">
+	<header class="mb-10 text-center md:mb-12">
+		<span class="mb-4 inline-block text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-500 md:text-xs">Der saisonale Kalender</span>
+		<h1 class="mb-6 font-serif text-4xl leading-tight text-stone-900 sm:text-5xl md:text-7xl">
+			Was wächst im <span id="month-title-main" class="italic text-lima-800">{currentMonthDisplayName}</span>?
+		</h1>
+		<p class="mx-auto mb-8 max-w-xl text-sm leading-relaxed text-stone-500">
+			Entdecke heimische Saisonware – oder suche gezielt nach einem Lebensmittel und sieh sein ganzes Jahr.
+		</p>
 
-        <div class="flex items-center justify-between sm:justify-center gap-4 sm:gap-8 border-y border-stone-200 py-4 md:py-6">
-            <button id="prev-month" type="button" class="group flex items-center gap-2 text-stone-400 hover:text-stone-900 transition-colors" aria-label="Vorheriger Monat">
-                <span class="text-xl md:text-2xl group-hover:-translate-x-1 transition-transform">←</span>
-                <span class="hidden sm:inline text-xs font-medium uppercase tracking-wider">Zurück</span>
-            </button>
+		<div class="relative mx-auto mb-8 max-w-2xl text-left">
+			<label for="food-search" class="sr-only">Lebensmittel suchen</label>
+			<span aria-hidden="true" class="absolute left-5 top-1/2 -translate-y-1/2 text-lg text-stone-500">⌕</span>
+			<input
+				id="food-search"
+				type="search"
+				autocomplete="off"
+				placeholder="Lebensmittel suchen, z. B. Apfel oder Tomate …"
+				class="w-full rounded-none border border-stone-300 bg-white py-4 pl-12 pr-24 text-base text-stone-900 shadow-[5px_5px_0_#e7e5e4] outline-none transition focus:border-lima-700 focus:shadow-[5px_5px_0_#82eb30]"
+			/>
+			<kbd
+				class="absolute right-4 top-1/2 hidden -translate-y-1/2 border border-stone-200 bg-stone-50 px-2 py-1 text-[10px] uppercase tracking-wider text-stone-500 sm:block">
+				⌘ K
+			</kbd>
+			<div
+				id="search-results"
+				class="absolute left-0 right-0 top-[calc(100%+8px)] z-40 hidden border border-stone-200 bg-paper p-2 shadow-xl"
+				role="listbox">
+			</div>
+		</div>
 
-            <div id="month-title" class="text-base md:text-lg font-serif italic text-stone-600 min-w-[120px] md:min-w-[150px]">
-                {currentMonthDisplayName}
-            </div>
+		<div class="flex items-center justify-between gap-4 border-y border-stone-200 py-4 sm:justify-center sm:gap-8 md:py-6">
+			<button
+				id="prev-month"
+				type="button"
+				class="group flex min-h-11 min-w-11 items-center gap-2 px-2 text-stone-500 transition-colors hover:text-stone-900"
+				aria-label="Vorheriger Monat">
+				<span class="text-2xl transition-transform group-hover:-translate-x-1">←</span><span
+					class="hidden text-xs font-medium uppercase tracking-wider sm:inline">
+					Zurück
+				</span>
+			</button>
+			<div id="month-title" class="min-w-[120px] font-serif text-base italic text-stone-600 md:min-w-[150px] md:text-lg">
+				{currentMonthDisplayName}
+			</div>
+			<button
+				id="next-month"
+				type="button"
+				class="group flex min-h-11 min-w-11 items-center justify-end gap-2 px-2 text-stone-500 transition-colors hover:text-stone-900"
+				aria-label="Nächster Monat">
+				<span class="hidden text-xs font-medium uppercase tracking-wider sm:inline">Weiter</span><span
+					class="text-2xl transition-transform group-hover:translate-x-1">
+					→
+				</span>
+			</button>
+		</div>
 
-            <button id="next-month" type="button" class="group flex items-center gap-2 text-stone-400 hover:text-stone-900 transition-colors" aria-label="Nächster Monat">
-                <span class="hidden sm:inline text-xs font-medium uppercase tracking-wider">Weiter</span>
-                <span class="text-xl md:text-2xl group-hover:translate-x-1 transition-transform">→</span>
-            </button>
-        </div>
+		<div class="mt-5 flex items-center justify-center gap-2" aria-label="Saison-Filter">
+			<button id="filter-all" type="button" class="filter-button is-active" aria-pressed="true">Alles Saisonale</button>
+			<button id="filter-freiland" type="button" class="filter-button" aria-pressed="false">Nur Freiland</button>
+			<button id="filter-lager" type="button" class="filter-button" aria-pressed="false">Nur Lager</button>
+		</div>
+		<p id="season-status-legend" class="mx-auto mt-4 max-w-md text-xs leading-relaxed text-stone-600">
+			Ohne Hinweis: frisch vom Feld (Freiland). <Fragment set:html={statusBadge("lager")} /> heimische Lagerware.{" "}
+			<Fragment set:html={statusBadge("both")} /> frisch und aus dem Lager.{" "}
+			<a href="/about/#freiland-lager" class="underline decoration-stone-300 underline-offset-4 hover:text-lima-800">Was heißt das?</a>
+		</p>
+	</header>
 
-        {
-            SHOW_SEASON_FILTER && (
-                <div class="mt-5 flex items-center justify-center gap-2" id="season-filter-toggle" aria-label="Saison-Filter">
-                    <button id="filter-all" type="button" class="rounded-full border border-stone-300 bg-stone-900 text-paper px-3 py-1 text-[10px] uppercase tracking-wider transition-colors" aria-pressed="true">
-                        Alle saisonal
-                    </button>
-                    <button id="filter-freiland" type="button" class="rounded-full border border-stone-300 bg-transparent text-stone-500 px-3 py-1 text-[10px] uppercase tracking-wider transition-colors" aria-pressed="false">
-                        Nur Freiland
-                    </button>
-                    <button id="filter-lager" type="button" class="rounded-full border border-stone-300 bg-transparent text-stone-500 px-3 py-1 text-[10px] uppercase tracking-wider transition-colors" aria-pressed="false">
-                        Nur Lager
-                    </button>
-                </div>
-            )
-        }
-        <div id="season-status-legend" class="mt-3 flex items-center justify-center gap-4 text-[10px] uppercase tracking-wider text-stone-500">
-            <span class="inline-flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-lima-400"></span> Freiland</span>
-            <span class="inline-flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-stone-300"></span> Lager</span>
-            <span class="inline-flex items-center gap-1"><span class="h-2.5 w-2.5 rounded-full bg-amber-300"></span> Beides</span>
-        </div>
-    </header>
+	<nav aria-label="Kategorien" class="-mt-4 mb-10 flex flex-wrap justify-center gap-2 lg:hidden">
+		{
+			categories.map(({ key, label, items }) => (
+				<a href={`#cat-${key}`} class="jump-link">
+					{label} <span data-count={key}>{items.length}</span>
+				</a>
+			))
+		}
+	</nav>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 lg:gap-8">
-        <section class="flex flex-col" data-category="vegetables">
-            <div class="flex items-baseline gap-3 mb-6 border-b border-stone-100 pb-2">
-                <span class="text-stone-300 font-serif italic text-2xl">01</span>
-                <h3 class="text-xl font-serif text-stone-800">Gemüse</h3>
-            </div>
-            <ul id="vegetables-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-y-3 gap-x-4">
-                {food.vegetables.map((vegetable) => (
-                    <li class="flex items-start gap-3 text-stone-600 group hover:text-lima-800 transition-colors cursor-default">
-                        <span class="opacity-40 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5">{vegetable.details.icon}</span>
-                        <span class="flex w-full min-w-0 items-center justify-between gap-2">
-                            <span class="text-sm tracking-wide truncate max-w-[84%]">{vegetable.name}</span>
-                            <span class:list={["h-2.5 w-2.5 shrink-0 rounded-full", getStatusDotClass(vegetable.availabilityType)]} title={statusLabel[vegetable.availabilityType]}></span>
-                        </span>
-                    </li>
-                ))}
-            </ul>
-        </section>
-
-        <section class="flex flex-col" data-category="fruits">
-            <div class="flex items-baseline gap-3 mb-6 border-b border-stone-100 pb-2">
-                <span class="text-stone-300 font-serif italic text-2xl">02</span>
-                <h3 class="text-xl font-serif text-stone-800">Obst</h3>
-            </div>
-            <ul id="fruits-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-y-3 gap-x-4">
-                {food.fruits.map((fruit) => (
-                    <li class="flex items-start gap-3 text-stone-600 group hover:text-lima-800 transition-colors cursor-default">
-                        <span class="w-1.5 h-1.5 rounded-full bg-stone-200 group-hover:bg-lima-400 transition-colors shrink-0 mt-2"></span>
-                        <span class="flex w-full min-w-0 items-center justify-between gap-2">
-                            <span class="text-sm tracking-wide truncate max-w-[84%]">{fruit.name}</span>
-                            <span class:list={["h-2.5 w-2.5 shrink-0 rounded-full", getStatusDotClass(fruit.availabilityType)]} title={statusLabel[fruit.availabilityType]}></span>
-                        </span>
-                    </li>
-                ))}
-            </ul>
-        </section>
-
-        <section class="flex flex-col" data-category="salads">
-            <div class="flex items-baseline gap-3 mb-6 border-b border-stone-100 pb-2">
-                <span class="text-stone-300 font-serif italic text-2xl">03</span>
-                <h3 class="text-xl font-serif text-stone-800">Salate</h3>
-            </div>
-            <ul id="salads-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-y-3 gap-x-4">
-                {food.salads.map((salad) => (
-                    <li class="flex items-start gap-3 text-stone-600 group hover:text-lima-800 transition-colors cursor-default">
-                        <span class="w-1.5 h-1.5 rounded-full bg-stone-200 group-hover:bg-lima-400 transition-colors shrink-0 mt-2"></span>
-                        <span class="flex w-full min-w-0 items-center justify-between gap-2">
-                            <span class="text-sm tracking-wide truncate max-w-[84%]">{salad.name}</span>
-                            <span class:list={["h-2.5 w-2.5 shrink-0 rounded-full", getStatusDotClass(salad.availabilityType)]} title={statusLabel[salad.availabilityType]}></span>
-                        </span>
-                    </li>
-                ))}
-            </ul>
-        </section>
-
-        <section class="flex flex-col" data-category="herbs">
-            <div class="flex items-baseline gap-3 mb-6 border-b border-stone-100 pb-2">
-                <span class="text-stone-300 font-serif italic text-2xl">04</span>
-                <h3 class="text-xl font-serif text-stone-800">Kräuter</h3>
-            </div>
-            <ul id="herbs-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-y-3 gap-x-4">
-                {food.herbs.map((herb) => (
-                    <li class="flex items-start gap-3 text-stone-600 group hover:text-lima-800 transition-colors cursor-default">
-                        <span class="w-1.5 h-1.5 rounded-full bg-stone-200 group-hover:bg-lima-400 transition-colors shrink-0 mt-2"></span>
-                        <span class="flex w-full min-w-0 items-center justify-between gap-2">
-                            <span class="text-sm tracking-wide truncate max-w-[84%]">{herb.name}</span>
-                            <span class:list={["h-2.5 w-2.5 shrink-0 rounded-full", getStatusDotClass(herb.availabilityType)]} title={statusLabel[herb.availabilityType]}></span>
-                        </span>
-                    </li>
-                ))}
-            </ul>
-        </section>
-    </div>
-
-    <footer class="mt-24 pt-12 border-t border-stone-100 text-center">
-        <p class="text-stone-400 text-xs uppercase tracking-widest leading-relaxed max-w-lg mx-auto">
-            Genieße, was die Natur uns schenkt. Saisonaler Konsum unterstützt lokale Bauern und schützt unsere Umwelt.
-        </p>
-    </footer>
+	<div class="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-x-12 lg:grid-cols-4 lg:grid-rows-[auto_1fr] lg:gap-x-8">
+		{
+			categories.map(({ key, number, label, items, sectionClass, listClass }) => (
+				<section id={`cat-${key}`} class:list={["flex scroll-mt-24 flex-col", sectionClass]} data-category={key}>
+					<div class="mb-4 flex items-baseline gap-3 border-b border-stone-200 pb-2">
+						<span aria-hidden="true" class="font-serif text-2xl italic text-stone-500">
+							{number}
+						</span>
+						<h2 class="font-serif text-xl text-stone-800">{label}</h2>
+					</div>
+					<ul id={`${key}-list`} class:list={["grid grid-cols-2 gap-x-4", listClass]} set:html={renderFoodList(items, true)} />
+				</section>
+			))
+		}
+	</div>
+	<footer class="mt-20 border-t border-stone-100 pt-10 text-center">
+		<p class="mx-auto max-w-lg text-xs uppercase leading-relaxed tracking-widest text-stone-500">
+			Saison heißt hier: heimischer Freilandanbau oder Lagerware – nicht bloß Verfügbarkeit im Supermarkt.
+		</p>
+	</footer>
 </div>
 
-<script is:inline type="application/json" id="food-data" set:html={JSON.stringify(foodData)}></script>
+<dialog
+	id="food-detail"
+	class="m-0 ml-auto h-full max-h-none w-full max-w-xl border-0 bg-paper p-0 text-stone-800 shadow-2xl backdrop:bg-stone-950/35 backdrop:backdrop-blur-sm">
+	<div class="flex min-h-full flex-col p-6 sm:p-10">
+		<div class="mb-8 flex items-center justify-between">
+			<span class="text-[10px] font-semibold uppercase tracking-[0.2em] text-lima-800">Lebensmittel im Jahreslauf</span><button
+				id="close-detail"
+				class="h-10 w-10 border border-stone-200 text-xl text-stone-500 transition hover:border-stone-900 hover:text-stone-900"
+				aria-label="Details schließen">
+				×
+			</button>
+		</div><div id="detail-content"></div>
+	</div>
+</dialog>
+
+<script is:inline type="application/json" id="food-data" set:html={JSON.stringify(foodData)} />
+<script is:inline type="application/json" id="food-details-data" set:html={JSON.stringify(foodDetails)} />
 
 <script>
 	import { getAvailableInMonth, getCurrentMonth, getMonthDisplayName, getNextMonth, getPreviousMonth } from "@src/utils/foodFilter";
-
-	const SHOW_SEASON_FILTER = true;
-
-	const dotStyles = {
-		freiland: "bg-lima-400",
-		lager: "bg-stone-300",
-		both: "bg-amber-300",
+	import { escapeHtml, renderFoodList } from "@src/utils/foodList";
+	const monthOrder = ["JAN", "FEB", "MRZ", "APR", "MAI", "JUN", "JUL", "AUG", "SEP", "OKT", "NOV", "DEZ"];
+	const monthShort = ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"];
+	const categoryLabels: Record<string, string> = { vegetables: "Gemüse", fruits: "Obst", salads: "Salat", herbs: "Kraut", nuts: "Nuss" };
+	const dotLabels = { freiland: "Freiland", lager: "Lager", both: "Freiland + Lager" };
+	const supplyLocations: Record<string, Array<{ label: string; x: number; y: number }>> = {
+		Deutschland: [{ label: "Deutschland", x: 343, y: 65 }],
+		"Italien & Polen": [
+			{ label: "Italien", x: 337, y: 82 },
+			{ label: "Polen", x: 351, y: 66 },
+		],
+		"Neuseeland & Chile": [
+			{ label: "Neuseeland", x: 610, y: 238 },
+			{ label: "Chile", x: 196, y: 231 },
+		],
+		Niederlande: [{ label: "Niederlande", x: 330, y: 61 }],
+		"Spanien & Marokko": [
+			{ label: "Spanien", x: 316, y: 84 },
+			{ label: "Marokko", x: 315, y: 101 },
+		],
+		Spanien: [{ label: "Spanien", x: 316, y: 84 }],
+		"Niederlande & Belgien": [
+			{ label: "Niederlande", x: 330, y: 61 },
+			{ label: "Belgien", x: 329, y: 67 },
+		],
 	};
-
-	const dotLabels = {
-		freiland: "Freiland",
-		lager: "Lager",
-		both: "Freiland + Lager",
-	};
-
-	function renderAvailabilityDot(type: keyof typeof dotStyles, filterMode: "all" | "freiland" | "lager"): string {
-		if (filterMode !== "all") {
-			return "";
-		}
-
-		const style = dotStyles[type] ?? dotStyles.lager;
-		const label = dotLabels[type] ?? dotLabels.lager;
-		return `<span class="h-2.5 w-2.5 shrink-0 rounded-full ${style}" title="${label}"></span>`;
-	}
-
-	function updateList<T>(listElement: HTMLElement | null, items: T[], renderFn: (item: T) => string): void {
-		if (!listElement) return;
-
-		listElement.innerHTML = "";
-
-		if (items.length === 0) {
-			const li = document.createElement("li");
-			li.className = "text-stone-400 text-xs italic col-span-2";
-			li.textContent = "Keine Auswahl verfügbar";
-			listElement.appendChild(li);
-			return;
-		}
-
-		items.forEach((item) => {
-			const li = document.createElement("li");
-			li.className = "flex items-start gap-3 text-stone-600 group hover:text-lima-800 transition-colors cursor-default";
-			li.innerHTML = renderFn(item);
-			listElement.appendChild(li);
-		});
-	}
-
-	function applyFilterButtonStyles(filterMode: "all" | "freiland" | "lager"): void {
-		if (!SHOW_SEASON_FILTER) return;
-		const allButton = document.getElementById("filter-all");
-		const freilandButton = document.getElementById("filter-freiland");
-		const lagerButton = document.getElementById("filter-lager");
-		const legend = document.getElementById("season-status-legend");
-
-		if (!allButton || !freilandButton || !lagerButton) return;
-
-		const baseClass = "rounded-full border border-stone-300 bg-transparent text-stone-500 px-3 py-1 text-[10px] uppercase tracking-wider transition-colors";
-		const activeClass = "rounded-full border border-stone-300 bg-stone-900 text-paper px-3 py-1 text-[10px] uppercase tracking-wider transition-colors";
-
-		allButton.className = filterMode === "all" ? activeClass : baseClass;
-		freilandButton.className = filterMode === "freiland" ? activeClass : baseClass;
-		lagerButton.className = filterMode === "lager" ? activeClass : baseClass;
-
-		allButton.setAttribute("aria-pressed", String(filterMode === "all"));
-		freilandButton.setAttribute("aria-pressed", String(filterMode === "freiland"));
-		lagerButton.setAttribute("aria-pressed", String(filterMode === "lager"));
-
-		if (legend) {
-			legend.classList.toggle("hidden", filterMode !== "all");
-		}
-	}
-
-	function updateMonthDisplay(monthAbbr: string, seasonData: Parameters<typeof getAvailableInMonth>[0], filterMode: "all" | "freiland" | "lager"): void {
-		const monthTitle = document.getElementById("month-title");
-		const monthTitleMain = document.getElementById("month-title-main");
-		const displayName = getMonthDisplayName(monthAbbr);
-
-		if (monthTitle) {
-			monthTitle.textContent = displayName;
-		}
-		if (monthTitleMain) {
-			monthTitleMain.textContent = displayName;
-		}
-
-		const food = getAvailableInMonth(seasonData, monthAbbr, {
-			onlyFreiland: filterMode === "freiland",
-			onlyLager: filterMode === "lager",
-		});
-
-		updateList(document.getElementById("vegetables-list"), food.vegetables, (v) => `
-            <span class="opacity-40 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5">${v.details.icon || ""}</span>
-            <span class="flex w-full min-w-0 items-center justify-between gap-2">
-                <span class="text-sm tracking-wide truncate max-w-[84%]">${v.name}</span>
-                ${renderAvailabilityDot(v.availabilityType, filterMode)}
-            </span>
-        `);
-		updateList(document.getElementById("fruits-list"), food.fruits, (f) => `
-            <span class="w-1.5 h-1.5 rounded-full bg-stone-200 group-hover:bg-lima-400 transition-colors shrink-0 mt-2"></span>
-            <span class="flex w-full min-w-0 items-center justify-between gap-2">
-                <span class="text-sm tracking-wide truncate max-w-[84%]">${f.name}</span>
-                ${renderAvailabilityDot(f.availabilityType, filterMode)}
-            </span>
-        `);
-		updateList(document.getElementById("herbs-list"), food.herbs, (h) => `
-            <span class="w-1.5 h-1.5 rounded-full bg-stone-200 group-hover:bg-lima-400 transition-colors shrink-0 mt-2"></span>
-            <span class="flex w-full min-w-0 items-center justify-between gap-2">
-                <span class="text-sm tracking-wide truncate max-w-[84%]">${h.name}</span>
-                ${renderAvailabilityDot(h.availabilityType, filterMode)}
-            </span>
-        `);
-		updateList(document.getElementById("salads-list"), food.salads, (s) => `
-            <span class="w-1.5 h-1.5 rounded-full bg-stone-200 group-hover:bg-lima-400 transition-colors shrink-0 mt-2"></span>
-            <span class="flex w-full min-w-0 items-center justify-between gap-2">
-                <span class="text-sm tracking-wide truncate max-w-[84%]">${s.name}</span>
-                ${renderAvailabilityDot(s.availabilityType, filterMode)}
-            </span>
-        `);
-
-		applyFilterButtonStyles(filterMode);
-	}
-
-	function initSeasonCalendar(): void {
-		const root = document.getElementById("food-month-root");
-		if (!root || root.dataset.initialized === "true") {
-			return;
-		}
+	function initSeasonCalendar() {
+		const root = document.getElementById("food-month-root") as HTMLElement | null;
+		if (!root || root.dataset.initialized === "true") return;
 		root.dataset.initialized = "true";
-
-		const foodDataScript = document.getElementById("food-data");
-		if (!foodDataScript) return;
-
-		const textContent = foodDataScript.textContent || "";
-		if (!textContent.trim()) return;
-
-		let seasonData: any;
-		try {
-			seasonData = JSON.parse(textContent);
-		} catch {
-			return;
-		}
-
-		let currentDisplayedMonth = getCurrentMonth();
+		const seasonData = JSON.parse(document.getElementById("food-data")?.textContent || "{}");
+		const detailData = JSON.parse(document.getElementById("food-details-data")?.textContent || "{}");
+		const dialog = document.getElementById("food-detail") as HTMLDialogElement;
+		const detailContent = document.getElementById("detail-content");
+		const search = document.getElementById("food-search") as HTMLInputElement;
+		const results = document.getElementById("search-results");
+		let currentMonth = getCurrentMonth();
 		let filterMode: "all" | "freiland" | "lager" = "all";
+		const allFoods = Object.entries(seasonData.availability).flatMap(([category, items]: [string, any]) =>
+			Object.entries(items).map(([name, details]) => ({ name, category, details: details as any })),
+		);
 
-		const prevButton = root.querySelector<HTMLElement>("#prev-month");
-		const nextButton = root.querySelector<HTMLElement>("#next-month");
-		const allButton = root.querySelector<HTMLElement>("#filter-all");
-		const freilandButton = root.querySelector<HTMLElement>("#filter-freiland");
-		const lagerButton = root.querySelector<HTMLElement>("#filter-lager");
-
-		if (!prevButton || !nextButton) return;
-
-		updateMonthDisplay(currentDisplayedMonth, seasonData, filterMode);
-
-		prevButton.addEventListener("click", () => {
-			const previousMonth = getPreviousMonth(currentDisplayedMonth);
-			currentDisplayedMonth = previousMonth;
-			updateMonthDisplay(currentDisplayedMonth, seasonData, filterMode);
-		});
-
-		nextButton.addEventListener("click", () => {
-			const nextMonth = getNextMonth(currentDisplayedMonth);
-			currentDisplayedMonth = nextMonth;
-			updateMonthDisplay(currentDisplayedMonth, seasonData, filterMode);
-		});
-
-		if (SHOW_SEASON_FILTER && allButton && freilandButton && lagerButton) {
-			allButton.addEventListener("click", () => {
-				filterMode = "all";
-				updateMonthDisplay(currentDisplayedMonth, seasonData, filterMode);
-			});
-
-			freilandButton.addEventListener("click", () => {
-				filterMode = "freiland";
-				updateMonthDisplay(currentDisplayedMonth, seasonData, filterMode);
-			});
-
-			lagerButton.addEventListener("click", () => {
-				filterMode = "lager";
-				updateMonthDisplay(currentDisplayedMonth, seasonData, filterMode);
-			});
+		function openDetail(name: string) {
+			const item = allFoods.find((entry) => entry.name === name);
+			if (!item || !detailContent) return;
+			const enriched = detailData[name];
+			const freiland = item.details.freiland_months || [];
+			const lager = item.details.lager_months || [];
+			const seasonalMonths = [...new Set([...freiland, ...lager])];
+			const timeline = monthOrder
+				.map((month, index) => {
+					const type =
+						freiland.includes(month) && lager.includes(month)
+							? "both"
+							: freiland.includes(month)
+								? "freiland"
+								: lager.includes(month)
+									? "lager"
+									: "none";
+					const style =
+						type === "freiland" ? "bg-lima-500" : type === "lager" ? "bg-stone-300" : type === "both" ? "bg-amber-300" : "bg-stone-100";
+					const typeLabel = type === "none" ? "keine heimische Saison" : dotLabels[type as keyof typeof dotLabels];
+					return `<div class="text-center"><span class="mb-2 block h-9 ${style}" title="${typeLabel}"></span><span class="text-[9px] uppercase tracking-wide text-stone-600">${monthShort[index]}<span class="sr-only">: ${typeLabel}</span></span></div>`;
+				})
+				.join("");
+			const origins =
+				enriched?.origins
+					?.map(
+						(origin: any) =>
+							`<li class="grid grid-cols-[1fr_auto] gap-x-4 border-t border-stone-200 py-3"><strong class="font-medium text-stone-800">${escapeHtml(origin.country)}</strong><span class="text-xs text-stone-500">${escapeHtml(origin.months)}</span><span class="col-span-2 mt-1 text-xs text-stone-500">${escapeHtml(origin.route)}</span></li>`,
+					)
+					.join("") || "";
+			const supplyMap = enriched ? renderSupplyMap(name, enriched.origins) : "";
+			const sources =
+				enriched?.sources
+					?.map(
+						(source: any) =>
+							`<a class="underline decoration-stone-300 underline-offset-4 hover:text-lima-800" href="${source.url}" target="_blank" rel="noreferrer">${escapeHtml(source.label)}</a>`,
+					)
+					.join(" · ") ||
+				`<a class="underline decoration-stone-300 underline-offset-4 hover:text-lima-800" href="${item.details.link}" target="_blank" rel="noreferrer">BZfE Lebensmittelkunde</a>`;
+			detailContent.innerHTML = `<div class="mb-2 text-xs uppercase tracking-widest text-stone-500">${categoryLabels[item.category] || item.category}</div><h2 class="mb-4 font-serif text-5xl italic text-stone-900">${escapeHtml(name)}</h2><p class="mb-8 text-base leading-relaxed text-stone-600">${escapeHtml(enriched?.summary || `Für ${name} sind ${seasonalMonths.length} Monate mit heimischer Freiland- oder Lagerware im Kalender erfasst.`)}</p><section class="mb-9"><h3 class="mb-3 text-xs font-semibold uppercase tracking-[0.16em] text-stone-800">Heimische Saison</h3><div class="grid grid-cols-12 gap-1">${timeline}</div><div aria-hidden="true" class="mt-3 flex gap-4 text-[10px] uppercase tracking-wider text-stone-600"><span class="inline-flex items-center gap-1"><span class="h-2.5 w-2.5 bg-lima-500"></span>Freiland</span><span class="inline-flex items-center gap-1"><span class="h-2.5 w-2.5 bg-stone-300"></span>Lager</span><span class="inline-flex items-center gap-1"><span class="h-2.5 w-2.5 bg-amber-300"></span>Beides</span></div></section>${enriched ? `<section class="mb-8 border-l-2 border-lima-500 bg-lima-50 p-5"><h3 class="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-lima-900">Einkaufstipp</h3><p class="text-sm leading-relaxed text-stone-700">${escapeHtml(enriched.tip)}</p></section><section class="mb-8"><div class="mb-2 flex items-baseline justify-between gap-4"><h3 class="text-xs font-semibold uppercase tracking-[0.16em] text-stone-800">Typische Wege nach Deutschland</h3><span class="shrink-0 border border-amber-300 bg-amber-50 px-2 py-1 text-[9px] uppercase tracking-wider text-amber-900">POC · indikativ</span></div><p class="mb-3 text-xs leading-relaxed text-stone-500">${escapeHtml(enriched.supplyNote)}</p>${supplyMap}<ul>${origins}</ul></section><section class="mb-8"><h3 class="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-stone-800">Aufbewahrung</h3><p class="text-sm leading-relaxed text-stone-600">${escapeHtml(enriched.storage)}</p></section>` : `<section class="mb-8 border border-dashed border-stone-300 p-5"><p class="text-sm leading-relaxed text-stone-500">Für dieses Lebensmittel zeigt der Prototyp bereits die Saison. Lieferwege und Lagerhinweise würden nach demselben Datenmodell ergänzt.</p></section>`}<p class="border-t border-stone-200 pt-4 text-[10px] leading-relaxed text-stone-500"><strong class="uppercase tracking-wider">Quellen:</strong> ${sources}. Importkorridore sind redaktionelle Orientierung; Herkunft am Produkt prüfen.</p>`;
+			dialog.showModal();
 		}
-	}
 
+		function renderSupplyMap(foodName: string, origins: Array<{ country: string }>) {
+			const germany = supplyLocations.Deutschland[0];
+			const points = origins.flatMap((origin) => supplyLocations[origin.country] || []);
+			const routes = points
+				.filter((point) => point.label !== "Deutschland")
+				.map((point, index) => {
+					const bend = Math.max(18, Math.abs(germany.x - point.x) * 0.18);
+					const middleX = (point.x + germany.x) / 2;
+					const middleY = Math.min(point.y, germany.y) - bend;
+					return `<path class="supply-route" style="animation-delay:${index * 120}ms" d="M ${point.x} ${point.y} Q ${middleX} ${middleY} ${germany.x} ${germany.y}"/><circle class="supply-origin" cx="${point.x}" cy="${point.y}" r="4"><title>${escapeHtml(point.label)} → Deutschland</title></circle>`;
+				})
+				.join("");
+			const labels = points
+				.filter((point, index, list) => list.findIndex((entry) => entry.label === point.label) === index)
+				.map((point) => `<text class="supply-label" x="${point.x + 7}" y="${point.y - 7}">${escapeHtml(point.label)}</text>`)
+				.join("");
+			return `<figure class="supply-map mb-5"><svg viewBox="0 0 640 280" role="img" aria-label="Schematische Weltkarte: typische Herkunftswege für ${escapeHtml(foodName)} nach Deutschland"><defs><pattern id="map-grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" stroke-width=".5"/></pattern></defs><rect width="640" height="280" fill="url(#map-grid)" class="map-grid"/><g class="map-land"><path d="M28 59 63 32l67 7 28 24 34 8 23 35-26 25-38-3-19 29-24 7-18-35-33-9-31-31z"/><path d="m157 167 27 11 22 34-2 42-17 18-15-39-25-30z"/><path d="m286 57 32-24 55 4 18 22 55-1 63 18 39 29-21 27-51-7-35 23-30-22-42 4-13-27-36-8-20-21z"/><path d="m320 133 45 7 24 35-14 60-27 30-30-41-10-53z"/><path d="m524 198 41-17 39 21-5 31-40 10-30-20z"/><path d="m600 246 19 6-9 10z"/></g>${routes}<circle class="supply-destination" cx="${germany.x}" cy="${germany.y}" r="6"><title>Deutschland</title></circle>${labels}<text class="supply-label supply-label--destination" x="${germany.x + 9}" y="${germany.y + 14}">Deutschland</text></svg><figcaption>Schematische Herkunftskorridore · keine exakten Routen oder Live-Transporte</figcaption></figure>`;
+		}
+
+		function bindFoodButtons() {
+			root!
+				.querySelectorAll<HTMLElement>("[data-food]")
+				.forEach((button) => button.addEventListener("click", () => openDetail(button.dataset.food || "")));
+		}
+		function updateList(key: string, items: any[]) {
+			const list = document.getElementById(`${key}-list`);
+			if (!list) return;
+			list.innerHTML = renderFoodList(items, filterMode === "all");
+			const count = root!.querySelector(`[data-count="${key}"]`);
+			if (count) count.textContent = String(items.length);
+		}
+		function render() {
+			document.getElementById("month-title")!.textContent = getMonthDisplayName(currentMonth);
+			document.getElementById("month-title-main")!.textContent = getMonthDisplayName(currentMonth);
+			const available = getAvailableInMonth(seasonData, currentMonth, {
+				onlyFreiland: filterMode === "freiland",
+				onlyLager: filterMode === "lager",
+			});
+			updateList("vegetables", available.vegetables);
+			updateList("fruits", [...available.fruits, ...available.nuts]);
+			updateList("salads", available.salads);
+			updateList("herbs", available.herbs);
+			["all", "freiland", "lager"].forEach((mode) => {
+				const button = document.getElementById(`filter-${mode}`);
+				button?.classList.toggle("is-active", filterMode === mode);
+				button?.setAttribute("aria-pressed", String(filterMode === mode));
+			});
+			document.getElementById("season-status-legend")?.classList.toggle("hidden", filterMode !== "all");
+			bindFoodButtons();
+		}
+
+		search.addEventListener("input", () => {
+			const query = search.value.trim().toLocaleLowerCase("de");
+			if (!query) {
+				results?.classList.add("hidden");
+				return;
+			}
+			const matches = allFoods.filter((item) => item.name.toLocaleLowerCase("de").includes(query)).slice(0, 7);
+			if (results) {
+				results.innerHTML = matches.length
+					? matches
+							.map(
+								(item) =>
+									`<button type="button" role="option" data-search-food="${escapeHtml(item.name)}" class="flex w-full items-center justify-between p-3 text-left hover:bg-stone-100"><span><strong class="font-serif text-lg font-normal text-stone-900">${escapeHtml(item.name)}</strong><small class="ml-3 uppercase tracking-wider text-stone-500">${categoryLabels[item.category] || item.category}</small></span><span class="text-xs text-lima-800">Jahreslauf →</span></button>`,
+							)
+							.join("")
+					: `<p class="p-4 text-sm text-stone-500">Kein Lebensmittel gefunden.</p>`;
+				results.classList.remove("hidden");
+				results.querySelectorAll<HTMLElement>("[data-search-food]").forEach((button) =>
+					button.addEventListener("click", () => {
+						openDetail(button.dataset.searchFood || "");
+						results.classList.add("hidden");
+					}),
+				);
+			}
+		});
+		document.addEventListener("keydown", (event) => {
+			if ((event.metaKey || event.ctrlKey) && event.key === "k") {
+				event.preventDefault();
+				search.focus();
+			}
+		});
+		document.getElementById("prev-month")?.addEventListener("click", () => {
+			currentMonth = getPreviousMonth(currentMonth);
+			render();
+		});
+		document.getElementById("next-month")?.addEventListener("click", () => {
+			currentMonth = getNextMonth(currentMonth);
+			render();
+		});
+		["all", "freiland", "lager"].forEach((mode) =>
+			document.getElementById(`filter-${mode}`)?.addEventListener("click", () => {
+				filterMode = mode as typeof filterMode;
+				render();
+			}),
+		);
+		document.getElementById("close-detail")?.addEventListener("click", () => dialog.close());
+		dialog.addEventListener("click", (event) => {
+			if (event.target === dialog) dialog.close();
+		});
+		bindFoodButtons();
+	}
 	document.addEventListener("DOMContentLoaded", initSeasonCalendar);
 	document.addEventListener("astro:page-load", initSeasonCalendar);
 </script>
 
 <style>
-    .font-serif {
-        font-family: Georgia, serif;
-    }
+	.font-serif {
+		font-family: Georgia, serif;
+	}
+	.filter-button {
+		border: 1px solid #d6d3d1;
+		padding: 0.5rem 0.75rem;
+		font-size: 10px;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: #78716c;
+		transition: all 0.2s;
+	}
+	.filter-button:hover {
+		border-color: #57534e;
+		color: #292524;
+	}
+	.jump-link {
+		border: 1px solid #d6d3d1;
+		padding: 0.5rem 0.75rem;
+		font-size: 11px;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: #57534e;
+	}
+	.jump-link span {
+		color: #78716c;
+	}
+	.jump-link:hover {
+		border-color: #1c1917;
+		color: #1c1917;
+	}
+	.filter-button.is-active {
+		border-color: #1c1917;
+		background: #1c1917;
+		color: #fdfcf8;
+	}
+	dialog[open] {
+		animation: detail-in 0.28s ease-out;
+	}
+	:global(.supply-map) {
+		border: 1px solid #e7e5e4;
+		background: #f8f7f1;
+	}
+	:global(.supply-map svg) {
+		display: block;
+		width: 100%;
+		height: auto;
+		overflow: visible;
+	}
+	:global(.supply-map figcaption) {
+		border-top: 1px solid #e7e5e4;
+		padding: 0.5rem 0.75rem;
+		font-size: 9px;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: #a8a29e;
+	}
+	:global(.map-grid) {
+		color: #e7e5e4;
+	}
+	:global(.map-land) {
+		fill: #deddd5;
+		stroke: #c9c7bb;
+		stroke-width: 1;
+	}
+	:global(.supply-route) {
+		fill: none;
+		stroke: #387f0c;
+		stroke-width: 1.8;
+		stroke-dasharray: 5 4;
+		stroke-linecap: round;
+		opacity: 0.72;
+		animation: route-in 0.8s ease-out both;
+	}
+	:global(.supply-origin) {
+		fill: #fdfcf8;
+		stroke: #387f0c;
+		stroke-width: 2.5;
+	}
+	:global(.supply-destination) {
+		fill: #82eb30;
+		stroke: #1c1917;
+		stroke-width: 2;
+	}
+	:global(.supply-label) {
+		font-family: Georgia, serif;
+		font-size: 10px;
+		font-style: italic;
+		fill: #57534e;
+		paint-order: stroke;
+		stroke: #f8f7f1;
+		stroke-width: 3px;
+		stroke-linejoin: round;
+	}
+	:global(.supply-label--destination) {
+		font-style: normal;
+		font-weight: 700;
+		fill: #1c1917;
+	}
+	@keyframes detail-in {
+		from {
+			opacity: 0;
+			transform: translateX(2rem);
+		}
+	}
+	@keyframes route-in {
+		from {
+			stroke-dashoffset: 80;
+			opacity: 0;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.supply-route,
+		dialog[open] {
+			animation: none;
+		}
+	}
 </style>

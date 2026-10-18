@@ -30,6 +30,14 @@ const fixtureData = {
 		},
 		herbs: {},
 		salads: {},
+		nuts: {
+			Walnuss: {
+				freiland_months: ["OKT"],
+				lager_months: ["MRZ"],
+				icon: "",
+				link: "",
+			},
+		},
 	},
 };
 
@@ -52,6 +60,14 @@ test("finds available food in March aliases", () => {
 	assert.equal(dataByMrz.fruits.length, 1);
 	assert.equal(dataByMaer.vegetables.length, 1);
 	assert.equal(dataByMaer.fruits.length, 1);
+});
+
+test("includes nuts with their availability type", () => {
+	assert.deepEqual(
+		getAvailableInMonth(fixtureData, "MRZ").nuts.map((item) => [item.name, item.availabilityType]),
+		[["Walnuss", "lager"]],
+	);
+	assert.equal(getAvailableInMonth(fixtureData, "MRZ", { onlyFreiland: true }).nuts.length, 0);
 });
 
 test("navigates months across year boundaries", () => {

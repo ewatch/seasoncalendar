@@ -1,12 +1,72 @@
-<h1 class="font-bold font-sans break-normal text-lima-900 pt-6 pb-2 text-3xl md:text-4xl">Saisonkalender</h1>
-<h2 class="py-2 font-sans text-lima-900">Was ist ein Saisonkalender ?</h2>
-<p class="py-6 text-lima-900">
-    Der Saisonkalender zeigt transparent auf welche natürlichen Lebensmittel (Gemüse, Kräuter, Obst, Salat) im aktuellen Monat im Land Deutschland angeboten werden können.
-    Dies sorgt für eine einfache Übersicht welche regionalen Lebensmittel man aktuell kaufen kann.
-</p>
+---
+import foodData from "@locales/de/food-calendar.json";
+import FormattedDate from "@components/FormattedDate.astro";
+import { statusBadge } from "@src/utils/foodList";
 
-<h2 class="py-2 font-sans text-lima-900">Was sind die Quellen der hier dargestellten Informationen ?</h2>
-<ul class="py-6 text-lima-900">
-    <li><a class="underline" href="https://www.bzfe.de/">Bundeszentrum für Ernährung</a></li>
-    <li><a class="underline" href="https://eatsmarter.de/">EAT SMARTER</a></li>
-</ul>
+const { sourceYear, lastReviewed } = foodData.metadata;
+const foodCount = Object.values(foodData.availability).reduce((sum, items) => sum + Object.keys(items).length, 0);
+---
+
+<article class="pb-20 text-stone-700">
+	<span class="mb-4 inline-block text-[10px] font-semibold uppercase tracking-[0.2em] text-stone-500 md:text-xs">Über das Projekt</span>
+	<h1 class="mb-6 font-serif text-4xl leading-tight text-stone-900 sm:text-5xl">
+		Was ist der <span class="italic text-lima-800">Saisonkalender</span>?
+	</h1>
+	<p class="mb-12 text-lg leading-relaxed text-stone-600">
+		Der Saisonkalender zeigt für jeden Monat, welches Gemüse, Obst, welche Salate, Kräuter und Nüsse in Deutschland aus heimischem Anbau
+		erhältlich sind – frisch vom Feld oder aus dem Lager. So siehst du auf einen Blick, was gerade regional Saison hat.
+	</p>
+
+	<section id="freiland-lager" class="mb-12 scroll-mt-24">
+		<h2 class="mb-4 border-b border-stone-200 pb-2 font-serif text-2xl text-stone-900">Freiland und Lager</h2>
+		<dl class="space-y-4 leading-relaxed">
+			<div>
+				<dt class="font-semibold text-stone-900">Freiland</dt>
+				<dd>Unter freiem Himmel in Deutschland gewachsen und frisch geerntet. In der Liste steht dafür kein Hinweis.</dd>
+			</div>
+			<div>
+				<dt class="font-semibold text-stone-900"><Fragment set:html={statusBadge("lager")} /> Lagerware</dt>
+				<dd>Heimische Ernte, die nach der Saison kühl gelagert wird – etwa Äpfel, Kartoffeln, Zwiebeln oder Kohl im Winter.</dd>
+			</div>
+			<div>
+				<dt class="font-semibold text-stone-900"><Fragment set:html={statusBadge("both")} /> Freiland und Lager</dt>
+				<dd>Im Übergang gibt es beides: die neue Ernte und noch gelagerte Ware.</dd>
+			</div>
+		</dl>
+		<p class="mt-4 leading-relaxed">
+			Nicht enthalten sind Gewächshausware und Importe. Tomaten, Gurken oder Salate aus deutschen Gewächshäusern gibt es deshalb oft
+			länger, als der Kalender anzeigt.
+		</p>
+	</section>
+
+	<section id="daten" class="mb-12 scroll-mt-24">
+		<h2 class="mb-4 border-b border-stone-200 pb-2 font-serif text-2xl text-stone-900">Daten und Stand</h2>
+		<ul class="list-disc space-y-2 pl-5 leading-relaxed">
+			<li>
+				Die Saisonmonate der {foodCount} Lebensmittel stammen aus dem{" "}
+				<a class="underline decoration-stone-300 underline-offset-4 hover:text-lima-800" href="https://eatsmarter.de/">EatSmarter-Saisonkalender</a>{" "}
+				({sourceYear}).
+			</li>
+			<li>
+				Zuletzt geprüft am <FormattedDate date={new Date(lastReviewed)} includeTime={false} />: Alle Einträge wurden mit der Vorlage abgeglichen und
+				mit dem{" "}
+				<a
+					class="underline decoration-stone-300 underline-offset-4 hover:text-lima-800"
+					href="https://www.bzfe.de/kueche-und-alltag/einkaufen/der-saisonkalender">Saisonkalender des Bundeszentrums für Ernährung (BZfE)</a
+				> auf Plausibilität geprüft.
+			</li>
+			<li>
+				Die Angaben sind Durchschnittswerte für Deutschland. Je nach Region und Wetter kann die Saison einige Wochen früher oder später beginnen.
+			</li>
+			<li>Die Seite wird jeden Monat neu erstellt, damit automatisch der aktuelle Monat angezeigt wird.</li>
+		</ul>
+	</section>
+
+	<section class="mb-12">
+		<h2 class="mb-4 border-b border-stone-200 pb-2 font-serif text-2xl text-stone-900">Mitmachen</h2>
+		<p class="leading-relaxed">
+			Der Saisonkalender ist ein offenes Projekt. Fehler in den Daten oder Ideen gerne auf{" "}
+			<a class="underline decoration-stone-300 underline-offset-4 hover:text-lima-800" href="https://github.com/ewatch/seasoncalendar">GitHub</a> melden.
+		</p>
+	</section>
+</article>

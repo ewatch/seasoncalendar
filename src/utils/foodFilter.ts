@@ -26,6 +26,7 @@ type AvailableInMonth = {
 	fruits: AvailableFoodItem[];
 	herbs: AvailableFoodItem[];
 	salads: AvailableFoodItem[];
+	nuts: AvailableFoodItem[];
 };
 
 type GetAvailableOptions = {
@@ -59,6 +60,7 @@ export const getAvailableInMonth = function (data: FoodData, month: string, opti
 		fruits: [],
 		herbs: [],
 		salads: [],
+		nuts: [],
 	};
 
 	for (const category in data.availability) {
@@ -104,6 +106,11 @@ export const getAvailableInMonth = function (data: FoodData, month: string, opti
 
 			if (category === "salads") {
 				availableInMonth.salads.push(itemWithType);
+				continue;
+			}
+
+			if (category === "nuts") {
+				availableInMonth.nuts.push(itemWithType);
 			}
 		}
 	}
